@@ -12,7 +12,7 @@ struct TubeStatusWatchApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationView {
-                ContentView()
+                Text("Hello, World!").padding()
             }
         }
     }
