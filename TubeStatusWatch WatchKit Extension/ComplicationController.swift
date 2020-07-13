@@ -72,9 +72,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                 let complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
                                                                                                                                Color(lines[1].id),
                                                                                                                                Color(lines[2].id)]))
-//                let complicationTemplate = CLKComplicationTemplateGraphicCircularView(RectangularComplicationContentView(title: lines.first!.name,
-//                                                                                                                         subtitle: (lines.first?.lineStatuses.first!.statusSeverityDescription)!,
-//                                                                                                                         color: Color(lines.first!.id)))
+//                let complicationTemplate = CLKComplicationTemplateGraphicCircularView(RectangularFullComplicationContentView(title: lines.first!.name,
+//                                                                                                                             subtitle: (lines.first?.lineStatuses.first!.statusSeverityDescription)!,
+//                                                                                                                             color: Color(lines.first!.id)))
                 handler(CLKComplicationTimelineEntry(date: Date(),
                                                      complicationTemplate: complicationTemplate))
             }

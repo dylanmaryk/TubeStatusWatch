@@ -60,7 +60,7 @@ struct PieChartSlice: View {
     
     var body: some View {
         path.fill(viewModel.color)
-            .overlay(path.stroke(Color.white, lineWidth: viewModel.isOnlySlice ? 0 : 1))
+            .overlay(path.stroke(Color.white, lineWidth: viewModel.isOnlySlice ? 0 : 2))
     }
 }
 
@@ -90,7 +90,16 @@ struct CircularComplicationContentView: View {
     }
 }
 
-struct RectangularComplicationContentView: View {
+struct CornerTextIconComplicationContentView: View {
+    let color: Color
+    
+    var body: some View {
+        Circle()
+            .fill(color)
+    }
+}
+
+struct RectangularFullComplicationContentView: View {
     let title: String
     let subtitle: String
     let color: Color
@@ -110,11 +119,20 @@ struct RectangularComplicationContentView: View {
     }
 }
 
-struct PieChart_Previews: PreviewProvider {
-    static var previews: some View {
-        PieChart(data: PieChartData(data: [PieChartSliceData(value: 1, color: .red),
-                                           PieChartSliceData(value: 2, color: .green),
-                                           PieChartSliceData(value: 3, color: .blue)]))
+struct RectangularLargeComplicationContentView: View {
+    let title: String
+    let color: Color
+    
+    var body: some View {
+        ZStack {
+            RoundedRectangle(cornerRadius: 25, style: .continuous)
+                .fill(color)
+                .transition(.slide)
+            VStack {
+                Text(title)
+                    .font(.headline)
+            }
+        }
     }
 }
 
@@ -125,35 +143,48 @@ struct ContentView_Previews: PreviewProvider {
     private static let circularContentViewThreeLines = CircularComplicationContentView(colors: [Color("bakerloo"),
                                                                                                 Color("central"),
                                                                                                 Color("circle")])
-    private static let rectangularContentView = RectangularComplicationContentView(title: "Bakerloo",
-                                                                                   subtitle: "Good Service",
-                                                                                   color: Color("bakerloo"))
+    private static let rectangularContentView = RectangularFullComplicationContentView(title: "Bakerloo",
+                                                                                       subtitle: "Good Service",
+                                                                                       color: Color("bakerloo"))
+    private static let rectangularLargeContentView = RectangularLargeComplicationContentView(title: "Good Service",
+                                                                                             color: Color("bakerloo"))
     
     static var previews: some View {
         Group {
-//            CLKComplicationTemplateGraphicCircularClosedGaugeView
-//            CLKComplicationTemplateGraphicCircularOpenGaugeView
-//            CLKComplicationTemplateGraphicCircularStackViewText
-//            CLKComplicationTemplateGraphicCircularView(contentView)
-//                .previewContext()
-//            CLKComplicationTemplateGraphicCornerCircularView(contentView)
-//                .previewContext()
-//            CLKComplicationTemplateGraphicCornerGaugeView
-//            CLKComplicationTemplateGraphicCornerTextView
-//            CLKComplicationTemplateGraphicExtraLargeCircularClosedGaugeView
-//            CLKComplicationTemplateGraphicExtraLargeCircularOpenGaugeView
-//            CLKComplicationTemplateGraphicExtraLargeCircularStackViewText
-            CLKComplicationTemplateGraphicExtraLargeCircularView(circularContentViewOneLine)
+            CLKComplicationTemplateGraphicCircularStackViewText(content: circularContentViewOneLine,
+                                                                textProvider: CLKTextProvider(format: "Good"))
                 .previewContext()
-            CLKComplicationTemplateGraphicExtraLargeCircularView(circularContentViewTwoLines)
+            CLKComplicationTemplateGraphicCircularView(circularContentViewThreeLines)
                 .previewContext()
+            CLKComplicationTemplateGraphicCornerCircularView(circularContentViewThreeLines)
+                .previewContext()
+            CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "Bakerloo"),
+                                                         label: Label(title: {},
+                                                                      icon: { CornerTextIconComplicationContentView(color: .green) }))
+                .previewContext()
+            CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "Bakerloo"),
+                                                         label: Label(title: {},
+                                                                      icon: { CornerTextIconComplicationContentView(color: .red) }))
+                .previewContext()
+            CLKComplicationTemplateGraphicExtraLargeCircularStackViewText(content: circularContentViewOneLine,
+                                                                          textProvider: CLKTextProvider(format: "Good"))
+                .previewContext()
+//            CLKComplicationTemplateGraphicExtraLargeCircularView(circularContentViewOneLine)
+//                .previewContext()
+//            CLKComplicationTemplateGraphicExtraLargeCircularView(circularContentViewTwoLines)
+//                .previewContext()
             CLKComplicationTemplateGraphicExtraLargeCircularView(circularContentViewThreeLines)
                 .previewContext()
             CLKComplicationTemplateGraphicRectangularFullView(rectangularContentView)
                 .previewContext()
-//            CLKComplicationTemplateGraphicRectangularLargeView
-//            CLKComplicationTemplateGraphicRectangularStandardBodyView
-//            CLKComplicationTemplateGraphicRectangularTextGaugeView
+            CLKComplicationTemplateGraphicRectangularLargeView(headerTextProvider: CLKTextProvider(format: "Bakerloo"),
+                                                               content: rectangularLargeContentView)
+                .previewContext()
+            CLKComplicationTemplateGraphicRectangularStandardBodyView(headerLabel: Label(title: {},
+                                                                                         icon: { CornerTextIconComplicationContentView(color: .green) }),
+                                                                      headerTextProvider: CLKTextProvider(format: "Bakerloo"),
+                                                                      body1TextProvider: CLKTextProvider(format: "Good Service"))
+                .previewContext()
         }
     }
 }
