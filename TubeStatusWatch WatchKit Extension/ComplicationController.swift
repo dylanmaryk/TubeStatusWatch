@@ -31,7 +31,20 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         let descriptors = [
             CLKComplicationDescriptor(identifier: "complication",
                                       displayName: "TubeStatusWatch",
-                                      supportedFamilies: CLKComplicationFamily.allCases)
+                                      supportedFamilies: [
+//                                        .modularSmall,
+//                                        .modularLarge,
+//                                        .utilitarianSmall,
+//                                        .utilitarianSmallFlat,
+//                                        .utilitarianLarge,
+//                                        .circularSmall,
+                                        .extraLarge,
+                                        .graphicCorner,
+                                        .graphicBezel,
+                                        .graphicCircular,
+                                        .graphicRectangular,
+                                        .graphicExtraLarge
+                                      ])
         ]
         handler(descriptors)
     }
@@ -69,14 +82,50 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                     print(error.localizedDescription)
                 }
             } receiveValue: { lines in
-                let complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
+                let complicationTemplate: CLKComplicationTemplate?
+                switch complication.family {
+                case .modularSmall: // tested
+                    fatalError()
+                case .modularLarge: // tested
+                    fatalError()
+                case .utilitarianSmall: // tested
+                    fatalError()
+                case .utilitarianSmallFlat: // tested
+                    fatalError()
+                case .utilitarianLarge: // tested
+                    fatalError()
+                case .circularSmall: // tested
+                    fatalError()
+                case .extraLarge:
+                    complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
                                                                                                                                Color(lines[1].id),
                                                                                                                                Color(lines[2].id)]))
-//                let complicationTemplate = CLKComplicationTemplateGraphicCircularView(RectangularFullComplicationContentView(title: lines.first!.name,
-//                                                                                                                             subtitle: (lines.first?.lineStatuses.first!.statusSeverityDescription)!,
-//                                                                                                                             color: Color(lines.first!.id)))
+                case .graphicCorner: // tested
+                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: lines.first!.name),
+                                                                                        label: Label(title: {},
+                                                                                                     icon: { CornerTextIconComplicationContentView(color: Color(lines[0].id)) }))
+                case .graphicBezel: // tested
+                    complicationTemplate = CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
+                                                                                                                                                                                                 Color(lines[1].id),
+                                                                                                                                                                                                 Color(lines[2].id)])),
+                                                                                           textProvider: CLKTextProvider(format: lines.first!.name))
+                case .graphicCircular: // tested
+                    complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
+                                                                                                                               Color(lines[1].id),
+                                                                                                                               Color(lines[2].id)]))
+                case .graphicRectangular: // tested
+                    complicationTemplate = CLKComplicationTemplateGraphicRectangularFullView(RectangularFullComplicationContentView(title: lines.first!.name,
+                                                                                                                                    subtitle: (lines.first?.lineStatuses.first!.statusSeverityDescription)!,
+                                                                                                                                    color: Color(lines.first!.id)))
+                case .graphicExtraLarge: // tested
+                    complicationTemplate = CLKComplicationTemplateGraphicExtraLargeCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
+                                                                                                                                         Color(lines[1].id),
+                                                                                                                                         Color(lines[2].id)]))
+                @unknown default:
+                    fatalError()
+                }
                 handler(CLKComplicationTimelineEntry(date: Date(),
-                                                     complicationTemplate: complicationTemplate))
+                                                     complicationTemplate: complicationTemplate!))
             }
     }
     
