@@ -101,9 +101,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                                                                                                                                Color(lines[1].id),
                                                                                                                                Color(lines[2].id)]))
                 case .graphicCorner: // tested
-                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: lines.first!.name),
-                                                                                        label: Label(title: {},
-                                                                                                     icon: { CornerTextIconComplicationContentView(color: Color(lines[0].id)) }))
+                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "🟢 \(lines.first!.name)"),
+                                                                                        label: Label(title: {}, icon: {}))
                 case .graphicBezel: // tested
                     complicationTemplate = CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
                                                                                                                                                                                                  Color(lines[1].id),
