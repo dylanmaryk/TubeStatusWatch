@@ -32,12 +32,12 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             CLKComplicationDescriptor(identifier: "complication",
                                       displayName: "TubeStatusWatch",
                                       supportedFamilies: [
-//                                        .modularSmall,
-//                                        .modularLarge,
-//                                        .utilitarianSmall,
-//                                        .utilitarianSmallFlat,
-//                                        .utilitarianLarge,
-//                                        .circularSmall,
+                                        .modularSmall,
+                                        .modularLarge,
+                                        .utilitarianSmall,
+                                        .utilitarianSmallFlat,
+                                        .utilitarianLarge,
+                                        .circularSmall,
                                         .extraLarge,
                                         .graphicCorner,
                                         .graphicBezel,
@@ -84,19 +84,22 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             } receiveValue: { lines in
                 let complicationTemplate: CLKComplicationTemplate?
                 switch complication.family {
-                case .modularSmall: // tested
-                    fatalError()
-                case .modularLarge: // tested
-                    fatalError()
-                case .utilitarianSmall: // tested
-                    fatalError()
-                case .utilitarianSmallFlat: // tested
-                    fatalError()
-                case .utilitarianLarge: // tested
-                    fatalError()
-                case .circularSmall: // tested
-                    fatalError()
-                case .extraLarge:
+                case .modularSmall: // very few characters fit, might not support
+                    complicationTemplate = CLKComplicationTemplateModularSmallStackText(line1TextProvider: CLKTextProvider(format: lines.first!.name),
+                                                                                        line2TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
+                case .modularLarge:
+                    complicationTemplate = CLKComplicationTemplateModularLargeStandardBody(headerTextProvider: CLKTextProvider(format: lines.first!.name),
+                                                                                           body1TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
+                case .utilitarianSmall, .utilitarianSmallFlat:
+                    complicationTemplate = CLKComplicationTemplateUtilitarianSmallFlat(textProvider: CLKTextProvider(format: "✅ \(lines.first!.name)"))
+                case .utilitarianLarge:
+                    complicationTemplate = CLKComplicationTemplateUtilitarianLargeFlat(textProvider: CLKTextProvider(format: "%@: %@",
+                                                                                                                     lines.first!.name,
+                                                                                                                     lines.first!.lineStatuses.first!.statusSeverityDescription))
+                case .circularSmall: // very few characters fit, might not support
+                    complicationTemplate = CLKComplicationTemplateCircularSmallStackText(line1TextProvider: CLKTextProvider(format: lines.first!.name),
+                                                                                         line2TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
+                case .extraLarge: // not tested
                     let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
                                                                          borderColor: .green),
                                       CircularComplicationSliceViewModel(fillColor: Color(lines[1].id),
@@ -104,10 +107,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                                       CircularComplicationSliceViewModel(fillColor: Color(lines[2].id),
                                                                          borderColor: .red)]
                     complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: viewModels))
-                case .graphicCorner: // tested
-                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "🟢 \(lines.first!.name)"),
+                case .graphicCorner:
+                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "✅ \(lines.first!.name)"),
                                                                                         label: Label(title: {}, icon: {}))
-                case .graphicBezel: // tested
+                case .graphicBezel:
                     let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
                                                                          borderColor: .green),
                                       CircularComplicationSliceViewModel(fillColor: Color(lines[1].id),
@@ -116,7 +119,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                                                                          borderColor: .red)]
                     complicationTemplate = CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: viewModels)),
                                                                                            textProvider: CLKTextProvider(format: lines.first!.name))
-                case .graphicCircular: // tested
+                case .graphicCircular:
                     let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
                                                                          borderColor: .green),
                                       CircularComplicationSliceViewModel(fillColor: Color(lines[1].id),
@@ -128,7 +131,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                     complicationTemplate = CLKComplicationTemplateGraphicRectangularFullView(RectangularFullComplicationContentView(title: lines.first!.name,
                                                                                                                                     subtitle: (lines.first?.lineStatuses.first!.statusSeverityDescription)!,
                                                                                                                                     color: Color(lines.first!.id)))
-                case .graphicExtraLarge: // tested
+                case .graphicExtraLarge:
                     let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
                                                                          borderColor: .green),
                                       CircularComplicationSliceViewModel(fillColor: Color(lines[1].id),
