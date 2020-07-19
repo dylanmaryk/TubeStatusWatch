@@ -97,29 +97,45 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                 case .circularSmall: // tested
                     fatalError()
                 case .extraLarge:
-                    complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
-                                                                                                                               Color(lines[1].id),
-                                                                                                                               Color(lines[2].id)]))
+                    let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
+                                                                         borderColor: .green),
+                                      CircularComplicationSliceViewModel(fillColor: Color(lines[1].id),
+                                                                         borderColor: .yellow),
+                                      CircularComplicationSliceViewModel(fillColor: Color(lines[2].id),
+                                                                         borderColor: .red)]
+                    complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: viewModels))
                 case .graphicCorner: // tested
                     complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "🟢 \(lines.first!.name)"),
                                                                                         label: Label(title: {}, icon: {}))
                 case .graphicBezel: // tested
-                    complicationTemplate = CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
-                                                                                                                                                                                                 Color(lines[1].id),
-                                                                                                                                                                                                 Color(lines[2].id)])),
+                    let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
+                                                                         borderColor: .green),
+                                      CircularComplicationSliceViewModel(fillColor: Color(lines[1].id),
+                                                                         borderColor: .yellow),
+                                      CircularComplicationSliceViewModel(fillColor: Color(lines[2].id),
+                                                                         borderColor: .red)]
+                    complicationTemplate = CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: viewModels)),
                                                                                            textProvider: CLKTextProvider(format: lines.first!.name))
                 case .graphicCircular: // tested
-                    complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
-                                                                                                                               Color(lines[1].id),
-                                                                                                                               Color(lines[2].id)]))
+                    let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
+                                                                         borderColor: .green),
+                                      CircularComplicationSliceViewModel(fillColor: Color(lines[1].id),
+                                                                         borderColor: .yellow),
+                                      CircularComplicationSliceViewModel(fillColor: Color(lines[2].id),
+                                                                         borderColor: .red)]
+                    complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: viewModels))
                 case .graphicRectangular: // tested
                     complicationTemplate = CLKComplicationTemplateGraphicRectangularFullView(RectangularFullComplicationContentView(title: lines.first!.name,
                                                                                                                                     subtitle: (lines.first?.lineStatuses.first!.statusSeverityDescription)!,
                                                                                                                                     color: Color(lines.first!.id)))
                 case .graphicExtraLarge: // tested
-                    complicationTemplate = CLKComplicationTemplateGraphicExtraLargeCircularView(CircularComplicationContentView(colors: [Color(lines[0].id),
-                                                                                                                                         Color(lines[1].id),
-                                                                                                                                         Color(lines[2].id)]))
+                    let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
+                                                                         borderColor: .green),
+                                      CircularComplicationSliceViewModel(fillColor: Color(lines[1].id),
+                                                                         borderColor: .yellow),
+                                      CircularComplicationSliceViewModel(fillColor: Color(lines[2].id),
+                                                                         borderColor: .red)]
+                    complicationTemplate = CLKComplicationTemplateGraphicExtraLargeCircularView(CircularComplicationContentView(viewModels: viewModels))
                 @unknown default:
                     fatalError()
                 }

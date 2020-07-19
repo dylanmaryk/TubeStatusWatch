@@ -8,16 +8,22 @@
 import ClockKit
 import SwiftUI
 
+struct CircularComplicationSliceViewModel {
+    let fillColor: Color
+    let borderColor: Color
+}
+
 struct PieChartSliceData {
     let value: Double
-    let color: Color
+    let fillColor: Color
+    let borderColor: Color
 }
 
 struct PieChartSliceViewModel: Hashable {
     let startAngle: Angle
     let endAngle: Angle
-    let color: Color
-    let isOnlySlice: Bool
+    let arcColor: Color
+    let borderColor: Color
 }
 
 class PieChartData {
@@ -33,17 +39,19 @@ class PieChartData {
             let endAngle = Angle(degrees: currentAngle)
             return PieChartSliceViewModel(startAngle: startAngle,
                                           endAngle: endAngle,
-                                          color: $0.color,
-                                          isOnlySlice: data.count == 1)
+                                          arcColor: $0.fillColor,
+                                          borderColor: $0.borderColor)
         }
     }
 }
 
 struct PieChartSlice: View {
+    private static let borderWidth: CGFloat = 5
+    
     let geometry: GeometryProxy
     let viewModel: PieChartSliceViewModel
     
-    var path: Path {
+    var borderPath: Path {
         let chartSize = geometry.size.width
         let radius = chartSize / 2
         let centerX = radius
@@ -58,9 +66,24 @@ struct PieChartSlice: View {
         return path
     }
     
+    var arcPath: Path {
+        let chartSize = geometry.size.width
+        let radius = chartSize / 2
+        let centerX = radius
+        let centerY = radius
+        var path = Path()
+        path.move(to: CGPoint(x: centerX, y: centerY))
+        path.addArc(center: CGPoint(x: centerX, y: centerY),
+                    radius: radius - Self.borderWidth,
+                    startAngle: viewModel.startAngle,
+                    endAngle: viewModel.endAngle,
+                    clockwise: false)
+        return path
+    }
+    
     var body: some View {
-        path.fill(viewModel.color)
-            .overlay(path.stroke(Color.white, lineWidth: viewModel.isOnlySlice ? 0 : 2))
+        borderPath.fill(viewModel.borderColor)
+        arcPath.fill(viewModel.arcColor)
     }
 }
 
@@ -79,10 +102,10 @@ struct PieChart: View {
 }
 
 struct CircularComplicationContentView: View {
-    let colors: [Color]
+    let viewModels: [CircularComplicationSliceViewModel]
     
     var pieChartSliceData: [PieChartSliceData] {
-        colors.map { PieChartSliceData(value: 1, color: $0) }
+        viewModels.map { PieChartSliceData(value: 1, fillColor: $0.fillColor, borderColor: $0.borderColor) }
     }
     
     var body: some View {
@@ -137,12 +160,18 @@ struct RectangularLargeComplicationContentView: View {
 }
 
 struct ContentView_Previews: PreviewProvider {
-    private static let circularOneLineContentView = CircularComplicationContentView(colors: [Color("bakerloo")])
-    private static let circularTwoLinesContentView = CircularComplicationContentView(colors: [Color("bakerloo"),
-                                                                                              Color("central")])
-    private static let circularThreeLinesContentView = CircularComplicationContentView(colors: [Color("bakerloo"),
-                                                                                                Color("central"),
-                                                                                                Color("circle")])
+    private static let circularOneLineContentView = CircularComplicationContentView(viewModels: [CircularComplicationSliceViewModel(fillColor: Color("bakerloo"),
+                                                                                                                                    borderColor: .green)])
+    private static let circularTwoLinesContentView = CircularComplicationContentView(viewModels: [CircularComplicationSliceViewModel(fillColor: Color("bakerloo"),
+                                                                                                                                     borderColor: .green),
+                                                                                                  CircularComplicationSliceViewModel(fillColor: Color("central"),
+                                                                                                                                     borderColor: .yellow)])
+    private static let circularThreeLinesContentView = CircularComplicationContentView(viewModels: [CircularComplicationSliceViewModel(fillColor: Color("bakerloo"),
+                                                                                                                                       borderColor: .green),
+                                                                                                    CircularComplicationSliceViewModel(fillColor: Color("central"),
+                                                                                                                                       borderColor: .yellow),
+                                                                                                    CircularComplicationSliceViewModel(fillColor: Color("circle"),
+                                                                                                                                       borderColor: .red)])
     private static let rectangularFullContentView = RectangularFullComplicationContentView(title: "Bakerloo",
                                                                                            subtitle: "Good Service",
                                                                                            color: Color("bakerloo"))
@@ -160,19 +189,15 @@ struct ContentView_Previews: PreviewProvider {
                 .previewContext()
             CLKComplicationTemplateGraphicCornerCircularView(circularThreeLinesContentView)
                 .previewContext()
-            CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "🟢 Bakerloo"),
+            CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "✅ Bakerloo"),
                                                          label: Label(title: {}, icon: {}))
                 .previewContext()
-            CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "🔴 Bakerloo"),
+            CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "❌ Bakerloo"),
                                                          label: Label(title: {}, icon: {}))
                 .previewContext()
             CLKComplicationTemplateGraphicExtraLargeCircularStackViewText(content: circularOneLineContentView,
                                                                           textProvider: CLKTextProvider(format: "Good"))
                 .previewContext()
-//            CLKComplicationTemplateGraphicExtraLargeCircularView(circularOneLineContentView)
-//                .previewContext()
-//            CLKComplicationTemplateGraphicExtraLargeCircularView(circularTwoLinesContentView)
-//                .previewContext()
             CLKComplicationTemplateGraphicExtraLargeCircularView(circularThreeLinesContentView)
                 .previewContext()
             CLKComplicationTemplateGraphicRectangularFullView(rectangularFullContentView)
@@ -185,11 +210,6 @@ struct ContentView_Previews: PreviewProvider {
                                                                       headerTextProvider: CLKTextProvider(format: "Bakerloo"),
                                                                       body1TextProvider: CLKTextProvider(format: "Good Service"))
                 .previewContext()
-//            CLKComplicationTemplateGraphicRectangularStandardBodyView(headerLabel: Label(title: {},
-//                                                                                         icon: { cornerTextIconRedContentView }),
-//                                                                      headerTextProvider: CLKTextProvider(format: "Bakerloo"),
-//                                                                      body1TextProvider: CLKTextProvider(format: "Good Service"))
-//                .previewContext()
         }
     }
 }
