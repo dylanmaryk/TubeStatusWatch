@@ -70,7 +70,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     func getCurrentTimelineEntry(for complication: CLKComplication,
                                  withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
         sessionCancellable = URLSession.shared
-            .dataTaskPublisher(for: URL(string: "https://api.tfl.gov.uk/line/mode/tube,overground,dlr,tflrail/status")!)
+            .dataTaskPublisher(for: URL(string: "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status")!)
             .map { $0.data }
             .decode(type: [Line].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
