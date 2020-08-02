@@ -42,29 +42,34 @@ class LineSetting: Codable, Identifiable, ObservableObject {
 
 struct LineButton: View {
     @ObservedObject var lineSetting: LineSetting
-    @Binding var selectedLineSettingIds: [String]
+    @Binding var selectedLineIds: [String]
     
     var body: some View {
-        Button(lineSetting.name) {
+        Button {
             lineSetting.isSelected.toggle()
             lineSetting.isSelected
-                ? selectedLineSettingIds.append(lineSetting.id)
-                : selectedLineSettingIds.removeAll { $0 == lineSetting.id }
+                ? selectedLineIds.append(lineSetting.id)
+                : selectedLineIds.removeAll { $0 == lineSetting.id }
+        } label: {
+            HStack {
+                Text(lineSetting.name)
+                Spacer()
+                lineSetting.isSelected ? Image(systemName: "checkmark") : nil
+            }
         }
-//        .listRowBackground(Color(lineSetting.id)
-        .listRowBackground((lineSetting.isSelected ? Color.green : Color.red) // temp
+        .listRowBackground(Color(lineSetting.id)
                             .cornerRadius(9))
     }
 }
 
 struct LineList: View {
     let lineSettings: [LineSetting]
-    @Binding var selectedLineSettingIds: [String]
+    @Binding var selectedLineIds: [String]
     
     var body: some View {
         List {
             ForEach(lineSettings) { lineSetting in
-                LineButton(lineSetting: lineSetting, selectedLineSettingIds: $selectedLineSettingIds)
+                LineButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
             }
         }
     }
@@ -72,8 +77,6 @@ struct LineList: View {
 
 @main
 struct TubeStatusWatchApp: App {
-    @AppStorage("selectedLineSettingIds") var selectedLineSettingIdsString = ""
-    
     private static let lineIds = ["bakerloo",
                                   "central",
                                   "circle",
@@ -106,18 +109,20 @@ struct TubeStatusWatchApp: App {
                                     "Victoria",
                                     "Waterloo & City"]
     
+    @AppStorage("selectedLineIds") var selectedLineIdsString = ""
+    
     var body: some Scene {
         WindowGroup {
-            let selectedLineSettingIds = Binding(
-                get: { selectedLineSettingIdsString.components(separatedBy: ",") },
-                set: { selectedLineSettingIdsString = $0.joined(separator: ",") }
+            let selectedLineIds = Binding(
+                get: { selectedLineIdsString.components(separatedBy: ",") },
+                set: { selectedLineIdsString = $0.joined(separator: ",") }
             )
             let lineSettings = Self.lineIds.enumerated().map { index, lineId in
                 LineSetting(id: lineId,
                             name: Self.lineNames[index],
-                            isSelected: selectedLineSettingIds.wrappedValue.contains(lineId))
+                            isSelected: selectedLineIds.wrappedValue.contains(lineId))
             }
-            LineList(lineSettings: lineSettings, selectedLineSettingIds: selectedLineSettingIds)
+            LineList(lineSettings: lineSettings, selectedLineIds: selectedLineIds)
         }
     }
 }
@@ -131,6 +136,6 @@ struct TubeStatusWatchApp_Previews: PreviewProvider {
             get: { ["bakerloo"] },
             set: { _ in }
         )
-        LineList(lineSettings: lineSettings, selectedLineSettingIds: selectedLineSettingIds)
+        LineList(lineSettings: lineSettings, selectedLineIds: selectedLineSettingIds)
     }
 }
