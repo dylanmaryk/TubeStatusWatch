@@ -32,12 +32,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             CLKComplicationDescriptor(identifier: "complication",
                                       displayName: "TubeStatusWatch",
                                       supportedFamilies: [
-                                        .modularSmall,
                                         .modularLarge,
                                         .utilitarianSmall,
                                         .utilitarianSmallFlat,
                                         .utilitarianLarge,
-                                        .circularSmall,
                                         .extraLarge,
                                         .graphicCorner,
                                         .graphicBezel,
@@ -84,9 +82,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             } receiveValue: { lines in
                 let complicationTemplate: CLKComplicationTemplate?
                 switch complication.family {
-                case .modularSmall: // very few characters fit, might not support
-                    complicationTemplate = CLKComplicationTemplateModularSmallStackText(line1TextProvider: CLKTextProvider(format: lines.first!.name),
-                                                                                        line2TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
+                case .modularSmall:
+                    complicationTemplate = nil
                 case .modularLarge:
                     complicationTemplate = CLKComplicationTemplateModularLargeStandardBody(headerTextProvider: CLKTextProvider(format: lines.first!.name),
                                                                                            body1TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
@@ -96,9 +93,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                     complicationTemplate = CLKComplicationTemplateUtilitarianLargeFlat(textProvider: CLKTextProvider(format: "%@: %@",
                                                                                                                      lines.first!.name,
                                                                                                                      lines.first!.lineStatuses.first!.statusSeverityDescription))
-                case .circularSmall: // very few characters fit, might not support
-                    complicationTemplate = CLKComplicationTemplateCircularSmallStackText(line1TextProvider: CLKTextProvider(format: lines.first!.name),
-                                                                                         line2TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
+                case .circularSmall:
+                    complicationTemplate = nil
                 case .extraLarge: // not tested
                     let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
                                                                          borderColor: .green),
