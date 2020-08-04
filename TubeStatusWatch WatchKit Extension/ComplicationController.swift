@@ -88,7 +88,8 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                     complicationTemplate = CLKComplicationTemplateModularLargeStandardBody(headerTextProvider: CLKTextProvider(format: lines.first!.name),
                                                                                            body1TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
                 case .utilitarianSmall, .utilitarianSmallFlat:
-                    complicationTemplate = CLKComplicationTemplateUtilitarianSmallFlat(textProvider: CLKTextProvider(format: "✅ \(lines.first!.name)"))
+                    complicationTemplate = CLKComplicationTemplateUtilitarianSmallFlat(textProvider: CLKTextProvider(format: lines.first!.name),
+                                                                                       imageProvider: CLKImageProvider(onePieceImage: UIImage(systemName: "checkmark")!))
                 case .utilitarianLarge:
                     complicationTemplate = CLKComplicationTemplateUtilitarianLargeFlat(textProvider: CLKTextProvider(format: "%@: %@",
                                                                                                                      lines.first!.name,
@@ -104,8 +105,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                                                                          borderColor: .red)]
                     complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: viewModels))
                 case .graphicCorner:
-                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "✅ \(lines.first!.name)"),
-                                                                                        label: Label(title: {}, icon: {}))
+                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: lines.first!.name),
+                                                                                        label: Label(title: {},
+                                                                                                     icon: { Image(systemName: "checkmark") }))
                 case .graphicBezel:
                     let viewModels = [CircularComplicationSliceViewModel(fillColor: Color(lines[0].id),
                                                                          borderColor: .green),
