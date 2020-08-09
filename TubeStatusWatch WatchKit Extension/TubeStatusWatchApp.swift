@@ -5,6 +5,7 @@
 //  Created by Dylan Maryk on 27/06/2020.
 //
 
+import ClockKit
 import Combine
 import SwiftUI
 
@@ -37,41 +38,6 @@ class LineSetting: Codable, Identifiable, ObservableObject {
         try container.encode(id, forKey: .id)
         try container.encode(name, forKey: .name)
         try container.encode(isSelected, forKey: .isSelected)
-    }
-}
-
-struct LineButton: View {
-    @ObservedObject var lineSetting: LineSetting
-    @Binding var selectedLineIds: [String]
-    
-    var body: some View {
-        Button {
-            lineSetting.isSelected.toggle()
-            lineSetting.isSelected
-                ? selectedLineIds.append(lineSetting.id)
-                : selectedLineIds.removeAll { $0 == lineSetting.id }
-        } label: {
-            HStack {
-                Text(lineSetting.name)
-                Spacer()
-                lineSetting.isSelected ? Image(systemName: "checkmark") : nil
-            }
-        }
-        .listRowBackground(Color(lineSetting.id)
-                            .cornerRadius(9))
-    }
-}
-
-struct LineList: View {
-    let lineSettings: [LineSetting]
-    @Binding var selectedLineIds: [String]
-    
-    var body: some View {
-        List {
-            ForEach(lineSettings) { lineSetting in
-                LineButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
-            }
-        }
     }
 }
 
@@ -109,12 +75,13 @@ struct TubeStatusWatchApp: App {
                                     "Victoria",
                                     "Waterloo & City"]
     
-    @AppStorage("selectedLineIds") var selectedLineIdsString = ""
+    @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
+    @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
     
     var body: some Scene {
         WindowGroup {
             let selectedLineIds = Binding(
-                get: { selectedLineIdsString.components(separatedBy: ",") },
+                get: { selectedLineIdsString.isEmpty ? [] : selectedLineIdsString.components(separatedBy: ",") },
                 set: { selectedLineIdsString = $0.joined(separator: ",") }
             )
             let lineSettings = Self.lineIds.enumerated().map { index, lineId in
@@ -124,6 +91,48 @@ struct TubeStatusWatchApp: App {
             }
             LineList(lineSettings: lineSettings, selectedLineIds: selectedLineIds)
         }
+    }
+}
+
+struct LineList: View {
+    let lineSettings: [LineSetting]
+    @Binding var selectedLineIds: [String]
+    
+    var body: some View {
+        List {
+            ForEach(lineSettings) { lineSetting in
+                LineButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
+            }
+        }
+    }
+}
+
+struct LineButton: View {
+    @ObservedObject var lineSetting: LineSetting
+    @Binding var selectedLineIds: [String]
+    
+    var body: some View {
+        Button {
+            lineSetting.isSelected.toggle()
+            lineSetting.isSelected
+                ? selectedLineIds.append(lineSetting.id)
+                : selectedLineIds.removeAll { $0 == lineSetting.id }
+        } label: {
+            HStack {
+                Text(lineSetting.name)
+                Spacer()
+                lineSetting.isSelected ? Image(systemName: "checkmark") : nil
+            }
+        }
+        .listRowBackground(Color(lineSetting.id)
+                            .cornerRadius(9))
+    }
+}
+
+class ExtensionDelegate: NSObject, WKExtensionDelegate {
+    func applicationDidEnterBackground() {
+        let complicationServer = CLKComplicationServer.sharedInstance()
+        complicationServer.activeComplications?.forEach(complicationServer.reloadTimeline)
     }
 }
 
