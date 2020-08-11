@@ -41,6 +41,79 @@ class LineSetting: Codable, Identifiable, ObservableObject {
     }
 }
 
+struct LineButton: View {
+    @ObservedObject var lineSetting: LineSetting
+    @Binding var selectedLineIds: [String]
+    
+    var body: some View {
+        Button {
+            lineSetting.isSelected.toggle()
+            lineSetting.isSelected
+                ? selectedLineIds.append(lineSetting.id)
+                : selectedLineIds.removeAll { $0 == lineSetting.id }
+        } label: {
+            HStack {
+                Text(lineSetting.name)
+                Spacer()
+                lineSetting.isSelected ? Image(systemName: "checkmark") : nil
+            }
+        }
+        .listRowBackground(Color(lineSetting.id)
+                            .cornerRadius(9))
+    }
+}
+
+struct LineList: View {
+    let lineSettings: [LineSetting]
+    @Binding var selectedLineIds: [String]
+    
+    var body: some View {
+        List {
+            ForEach(lineSettings) { lineSetting in
+                LineButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
+            }
+        }
+    }
+}
+
+struct LineUpdate: View {
+    let name: String
+    let statusSeverityDescription: String?
+    let reason: String?
+    
+    var body: some View {
+        VStack {
+            Text(name)
+                .font(.title3)
+                .frame(maxWidth: .infinity, alignment: .leading)
+            if let statusSeverityDescription = statusSeverityDescription {
+                Text(statusSeverityDescription)
+                    .font(.headline)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            if let reason = reason {
+                Text(reason)
+                    .font(.body)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+}
+
+struct LineUpdateList: View {
+    let lines: [Line]
+    
+    var body: some View {
+        List {
+            ForEach(lines) { line in
+                LineUpdate(name: line.name,
+                           statusSeverityDescription: line.lineStatuses.first?.statusSeverityDescription,
+                           reason: line.lineStatuses.first?.reason)
+            }
+        }
+    }
+}
+
 @main
 struct TubeStatusWatchApp: App {
     private static let lineIds = ["bakerloo",
@@ -76,56 +149,36 @@ struct TubeStatusWatchApp: App {
                                     "Waterloo & City"]
     
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
+    @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
     @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
+    @State private var isSheetPresented = false
     
     var body: some Scene {
+        let selectedLineIds = Binding(
+            get: { selectedLineIdsString.isEmpty ? [] : selectedLineIdsString.components(separatedBy: ",") },
+            set: { selectedLineIdsString = $0.joined(separator: ",") }
+        )
+        let lineSettings = Self.lineIds.enumerated().map { index, lineId in
+            LineSetting(id: lineId,
+                        name: Self.lineNames[index],
+                        isSelected: selectedLineIds.wrappedValue.contains(lineId))
+        }
+        
         WindowGroup {
-            let selectedLineIds = Binding(
-                get: { selectedLineIdsString.isEmpty ? [] : selectedLineIdsString.components(separatedBy: ",") },
-                set: { selectedLineIdsString = $0.joined(separator: ",") }
-            )
-            let lineSettings = Self.lineIds.enumerated().map { index, lineId in
-                LineSetting(id: lineId,
-                            name: Self.lineNames[index],
-                            isSelected: selectedLineIds.wrappedValue.contains(lineId))
-            }
             LineList(lineSettings: lineSettings, selectedLineIds: selectedLineIds)
+                .onAppear {
+                    isSheetPresented = selectedLineUpdatesData != nil
+                }
+                .onChange(of: selectedLineUpdatesData) { value in
+                    isSheetPresented = value != nil
+                }
+                .sheet(isPresented: $isSheetPresented, onDismiss: { selectedLineUpdatesData = nil }) {
+                    if let selectedLineUpdatesData = selectedLineUpdatesData,
+                       let selectedLines = try? JSONDecoder().decode([Line].self, from: selectedLineUpdatesData) {
+                        LineUpdateList(lines: selectedLines)
+                    }
+                }
         }
-    }
-}
-
-struct LineList: View {
-    let lineSettings: [LineSetting]
-    @Binding var selectedLineIds: [String]
-    
-    var body: some View {
-        List {
-            ForEach(lineSettings) { lineSetting in
-                LineButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
-            }
-        }
-    }
-}
-
-struct LineButton: View {
-    @ObservedObject var lineSetting: LineSetting
-    @Binding var selectedLineIds: [String]
-    
-    var body: some View {
-        Button {
-            lineSetting.isSelected.toggle()
-            lineSetting.isSelected
-                ? selectedLineIds.append(lineSetting.id)
-                : selectedLineIds.removeAll { $0 == lineSetting.id }
-        } label: {
-            HStack {
-                Text(lineSetting.name)
-                Spacer()
-                lineSetting.isSelected ? Image(systemName: "checkmark") : nil
-            }
-        }
-        .listRowBackground(Color(lineSetting.id)
-                            .cornerRadius(9))
     }
 }
 
@@ -145,6 +198,22 @@ struct TubeStatusWatchApp_Previews: PreviewProvider {
             get: { ["bakerloo"] },
             set: { _ in }
         )
-        LineList(lineSettings: lineSettings, selectedLineIds: selectedLineSettingIds)
+        let goodServiceLineStatus = LineStatus(statusSeverity: .goodService,
+                                               statusSeverityDescription: "Good Service",
+                                               reason: "Good Service reason")
+        let specialServiceLineStatus = LineStatus(statusSeverity: .specialService,
+                                                  statusSeverityDescription: "Special Service",
+                                                  reason: "Special Service reason")
+        let closedLineStatus = LineStatus(statusSeverity: .closed,
+                                          statusSeverityDescription: "Closed",
+                                          reason: "Closed reason")
+        let lines = [Line(id: "bakerloo", name: "Bakerloo", lineStatuses: [goodServiceLineStatus]),
+                     Line(id: "central", name: "Central", lineStatuses: [specialServiceLineStatus]),
+                     Line(id: "circle", name: "Circle", lineStatuses: [closedLineStatus])]
+        
+        Group {
+            LineList(lineSettings: lineSettings, selectedLineIds: selectedLineSettingIds)
+            LineUpdateList(lines: lines)
+        }
     }
 }

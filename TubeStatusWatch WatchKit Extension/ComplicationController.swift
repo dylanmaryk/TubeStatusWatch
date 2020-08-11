@@ -9,7 +9,7 @@ import ClockKit
 import Combine
 import SwiftUI
 
-enum StatusSeverity: Int, Decodable {
+enum StatusSeverity: Int, Codable {
     case specialService
     case closed
     case suspended
@@ -33,13 +33,13 @@ enum StatusSeverity: Int, Decodable {
     case serviceClosed
 }
 
-struct Line: Decodable {
+struct Line: Codable, Identifiable {
     let id: String
     let name: String
     let lineStatuses: [LineStatus]
 }
 
-struct LineStatus: Decodable {
+struct LineStatus: Codable {
     let statusSeverity: StatusSeverity
     let statusSeverityDescription: String
     let reason: String?
@@ -112,6 +112,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                     ? []
                     : selectedLineIdsString.components(separatedBy: ",")
                 let selectedLines = lines.filter { selectedLineIds.contains($0.id) }
+                UserDefaults.standard.setValue(try! JSONEncoder().encode(selectedLines), forKey: "selectedLineUpdates")
                 let sliceViewModels = selectedLines.map { line -> CircularComplicationSliceViewModel in
                     let fillColor = Color(line.id)
                     let borderColor = self.sliceBorderColor(for: line.lineStatuses.first!.statusSeverity)
