@@ -41,7 +41,7 @@ class LineSetting: Codable, Identifiable, ObservableObject {
     }
 }
 
-struct LineButton: View {
+struct LineSettingButton: View {
     @ObservedObject var lineSetting: LineSetting
     @Binding var selectedLineIds: [String]
     
@@ -63,20 +63,20 @@ struct LineButton: View {
     }
 }
 
-struct LineList: View {
+struct LineSettingList: View {
     let lineSettings: [LineSetting]
     @Binding var selectedLineIds: [String]
     
     var body: some View {
         List {
             ForEach(lineSettings) { lineSetting in
-                LineButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
+                LineSettingButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
             }
         }
     }
 }
 
-struct LineUpdate: View {
+struct LineUpdateItem: View {
     let name: String
     let statusSeverityDescription: String?
     let reason: String?
@@ -106,9 +106,9 @@ struct LineUpdateList: View {
     var body: some View {
         List {
             ForEach(lines) { line in
-                LineUpdate(name: line.name,
-                           statusSeverityDescription: line.lineStatuses.first?.statusSeverityDescription,
-                           reason: line.lineStatuses.first?.reason)
+                LineUpdateItem(name: line.name,
+                               statusSeverityDescription: line.lineStatuses.first?.statusSeverityDescription,
+                               reason: line.lineStatuses.first?.reason)
             }
         }
     }
@@ -165,7 +165,7 @@ struct TubeStatusWatchApp: App {
         }
         
         WindowGroup {
-            LineList(lineSettings: lineSettings, selectedLineIds: selectedLineIds)
+            LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds)
                 .onAppear {
                     isSheetPresented = selectedLineUpdatesData != nil
                 }
@@ -212,7 +212,7 @@ struct TubeStatusWatchApp_Previews: PreviewProvider {
                      Line(id: "circle", name: "Circle", lineStatuses: [closedLineStatus])]
         
         Group {
-            LineList(lineSettings: lineSettings, selectedLineIds: selectedLineSettingIds)
+            LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineSettingIds)
             LineUpdateList(lines: lines)
         }
     }
