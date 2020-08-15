@@ -9,6 +9,12 @@ import ClockKit
 import Combine
 import SwiftUI
 
+enum ComplicationIdentifier: String {
+    case onlyLineComplication
+    case singleLineComplication
+    case multipleLineComplication
+}
+
 enum StatusSeverity: Int, Codable {
     case specialService
     case closed
@@ -33,16 +39,16 @@ enum StatusSeverity: Int, Codable {
     case serviceClosed
 }
 
-struct Line: Codable, Identifiable {
-    let id: String
-    let name: String
-    let lineStatuses: [LineStatus]
-}
-
 struct LineStatus: Codable {
     let statusSeverity: StatusSeverity
     let statusSeverityDescription: String
     let reason: String?
+}
+
+struct Line: Codable, Identifiable {
+    let id: String
+    let name: String
+    let lineStatuses: [LineStatus]
 }
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
@@ -55,22 +61,30 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     // MARK: - Complication Configuration
     
     func getComplicationDescriptors(handler: @escaping ([CLKComplicationDescriptor]) -> Void) {
-        let descriptors = [
-            CLKComplicationDescriptor(identifier: "complication",
-                                      displayName: "TubeStatusWatch",
-                                      supportedFamilies: [
-                                        .modularLarge,
-                                        .utilitarianSmall,
-                                        .utilitarianSmallFlat,
-                                        .utilitarianLarge,
-                                        .extraLarge,
-                                        .graphicCorner,
-                                        .graphicBezel,
-                                        .graphicCircular,
-                                        .graphicRectangular,
-                                        .graphicExtraLarge
-                                      ])
-        ]
+        let descriptors: [CLKComplicationDescriptor]
+        let selectedLineIds = selectedLineIdsString.componentsOrEmpty(separatedBy: ",")
+        if selectedLineIds.count == 1,
+           let lineId = selectedLineIds.first,
+           let lineName = LineData.lineIdsToNames[lineId] {
+            let identifier = ComplicationIdentifier.onlyLineComplication.rawValue
+            let onlyLineDescriptor = singleLineComplicationDescriptor(identifier: identifier,
+                                                                      lineName: lineName,
+                                                                      lineId: lineId)
+            descriptors = [onlyLineDescriptor]
+        } else {
+            let multipleLineDescriptor = multipleLineComplicationDescriptor()
+            let singleLineDescriptors = selectedLineIds
+                .compactMap { lineId -> CLKComplicationDescriptor? in
+                    guard let lineName = LineData.lineIdsToNames[lineId] else {
+                        return nil
+                    }
+                    let identifierPrefix = ComplicationIdentifier.singleLineComplication.rawValue
+                    return singleLineComplicationDescriptor(identifier: "\(identifierPrefix)-\(lineId)",
+                                                            lineName: lineName,
+                                                            lineId: lineId)
+                }
+            descriptors = [multipleLineDescriptor] + singleLineDescriptors
+        }
         handler(descriptors)
     }
     
@@ -99,22 +113,35 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             .map { $0.data }
             .decode(type: [Line].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
-            .sink { completion in
-                switch completion {
-                case .finished:
-                    break
-                case .failure(let error):
-                    print(error.localizedDescription)
-                }
-            } receiveValue: { lines in
-                let selectedLineIds = self.selectedLineIdsString.isEmpty
-                    ? []
-                    : self.selectedLineIdsString.components(separatedBy: ",")
+            .sink { _ in } receiveValue: { lines in
+                let selectedLineIds = self.selectedLineIdsString.componentsOrEmpty(separatedBy: ",")
                 let selectedLines = lines.filter { selectedLineIds.contains($0.id) }
                 self.selectedLineUpdatesData = try? JSONEncoder().encode(selectedLines)
-                let sliceViewModels = selectedLines.map { line -> CircularComplicationSliceViewModel in
+                let visibleLines: [Line?]
+                guard let complicationIdentifierPrefix = complication
+                        .identifier
+                        .components(separatedBy: "-")
+                        .first else {
+                    fatalError("Failed to get complication identifier prefix")
+                }
+                switch ComplicationIdentifier(rawValue: complicationIdentifierPrefix) {
+                case .onlyLineComplication:
+                    visibleLines = [selectedLines.first]
+                case .singleLineComplication:
+                    let complicationLineId = complication.userInfo?["lineId"] as? String
+                    let line = lines.first { $0.id == complicationLineId }
+                    visibleLines = [line]
+                case .multipleLineComplication:
+                    visibleLines = selectedLines
+                case .none:
+                    fatalError("Unrecognized complication")
+                }
+                let sliceViewModels = visibleLines.compactMap { line -> CircularComplicationSliceViewModel? in
+                    guard let line = line, let lineStatus = line.lineStatuses.first else {
+                        return nil
+                    }
                     let fillColor = Color(line.id)
-                    let borderColor = StatusSeverityColorMapper.color(for: line.lineStatuses.first!.statusSeverity)
+                    let borderColor = StatusSeverityColorMapper.color(for: lineStatus.statusSeverity)
                     return CircularComplicationSliceViewModel(fillColor: fillColor, borderColor: borderColor)
                 }
                 let complicationTemplate: CLKComplicationTemplate?
@@ -122,31 +149,31 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                 case .modularSmall, .circularSmall:
                     complicationTemplate = nil
                 case .modularLarge:
-                    complicationTemplate = CLKComplicationTemplateModularLargeStandardBody(headerTextProvider: CLKTextProvider(format: lines.first!.name),
-                                                                                           body1TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
+                    complicationTemplate = CLKComplicationTemplateModularLargeStandardBody(headerTextProvider: CLKTextProvider(format: visibleLines.first!!.name),
+                                                                                           body1TextProvider: CLKTextProvider(format: visibleLines.first!!.lineStatuses.first!.statusSeverityDescription))
                 case .utilitarianSmall, .utilitarianSmallFlat:
-                    complicationTemplate = CLKComplicationTemplateUtilitarianSmallFlat(textProvider: CLKTextProvider(format: lines.first!.name),
+                    complicationTemplate = CLKComplicationTemplateUtilitarianSmallFlat(textProvider: CLKTextProvider(format: visibleLines.first!!.name),
                                                                                        imageProvider: CLKImageProvider(onePieceImage: UIImage(systemName: "checkmark")!))
                 case .utilitarianLarge:
                     complicationTemplate = CLKComplicationTemplateUtilitarianLargeFlat(textProvider: CLKTextProvider(format: "%@: %@",
-                                                                                                                     lines.first!.name,
-                                                                                                                     lines.first!.lineStatuses.first!.statusSeverityDescription))
+                                                                                                                     visibleLines.first!!.name,
+                                                                                                                     visibleLines.first!!.lineStatuses.first!.statusSeverityDescription))
                 case .extraLarge: // extraLarge not tested
-                    complicationTemplate = CLKComplicationTemplateExtraLargeStackText(line1TextProvider: CLKTextProvider(format: lines.first!.name),
-                                                                                      line2TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
+                    complicationTemplate = CLKComplicationTemplateExtraLargeStackText(line1TextProvider: CLKTextProvider(format: visibleLines.first!!.name),
+                                                                                      line2TextProvider: CLKTextProvider(format: visibleLines.first!!.lineStatuses.first!.statusSeverityDescription))
                 case .graphicCorner:
-                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: lines.first!.name),
+                    complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: visibleLines.first!!.name),
                                                                                         label: Label(title: {},
                                                                                                      icon: { Image(systemName: "checkmark") }))
                 case .graphicBezel:
                     complicationTemplate = CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: sliceViewModels)),
-                                                                                           textProvider: CLKTextProvider(format: lines.first!.name))
+                                                                                           textProvider: CLKTextProvider(format: visibleLines.first!!.name))
                 case .graphicCircular:
                     complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: sliceViewModels))
                 case .graphicRectangular:
-                    complicationTemplate = CLKComplicationTemplateGraphicRectangularFullView(RectangularFullComplicationContentView(title: lines.first!.name,
-                                                                                                                                    subtitle: (lines.first?.lineStatuses.first!.statusSeverityDescription)!,
-                                                                                                                                    color: Color(lines.first!.id)))
+                    complicationTemplate = CLKComplicationTemplateGraphicRectangularFullView(RectangularFullComplicationContentView(title: visibleLines.first!!.name,
+                                                                                                                                    subtitle: (visibleLines.first?!.lineStatuses.first!.statusSeverityDescription)!,
+                                                                                                                                    color: Color(visibleLines.first!!.id)))
                 case .graphicExtraLarge:
                     complicationTemplate = CLKComplicationTemplateGraphicExtraLargeCircularView(CircularComplicationContentView(viewModels: sliceViewModels))
                 @unknown default:
@@ -173,6 +200,38 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                                       withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
         // TODO: Handle sample templates
         handler(nil)
+    }
+    
+    // MARK: - Complication Descriptor Helpers
+    
+    private func singleLineComplicationDescriptor(identifier: String,
+                                                  lineName: String,
+                                                  lineId: String) -> CLKComplicationDescriptor {
+        return CLKComplicationDescriptor(identifier: identifier,
+                                         displayName: lineName,
+                                         supportedFamilies: [
+                                            .modularLarge,
+                                            .utilitarianSmall,
+                                            .utilitarianSmallFlat,
+                                            .utilitarianLarge,
+                                            .extraLarge,
+                                            .graphicCorner,
+                                            .graphicBezel,
+                                            .graphicCircular,
+                                            .graphicRectangular,
+                                            .graphicExtraLarge
+                                         ],
+                                         userInfo: ["lineId" : lineId])
+    }
+    
+    private func multipleLineComplicationDescriptor() -> CLKComplicationDescriptor {
+        return CLKComplicationDescriptor(identifier: ComplicationIdentifier.multipleLineComplication.rawValue,
+                                         displayName: "All Selected Lines",
+                                         supportedFamilies: [
+                                            .graphicBezel,
+                                            .graphicCircular,
+                                            .graphicExtraLarge
+                                         ])
     }
     
 }

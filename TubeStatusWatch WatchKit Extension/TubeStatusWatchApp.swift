@@ -122,38 +122,6 @@ struct LineUpdateList: View {
 
 @main
 struct TubeStatusWatchApp: App {
-    private static let lineIds = ["bakerloo",
-                                  "central",
-                                  "circle",
-                                  "district",
-                                  "dlr",
-                                  "hammersmith-city",
-                                  "jubilee",
-                                  "london-overground",
-                                  "metropolitan",
-                                  "northern",
-                                  "piccadilly",
-                                  "tfl-rail",
-                                  "tram",
-                                  "victoria",
-                                  "waterloo-city"]
-    
-    private static let lineNames = ["Bakerloo",
-                                    "Central",
-                                    "Circle",
-                                    "District",
-                                    "DLR",
-                                    "Hammersmith & City",
-                                    "Jubilee",
-                                    "London Overground",
-                                    "Metropolitan",
-                                    "Northern",
-                                    "Piccadilly",
-                                    "TfL Rail",
-                                    "Tram",
-                                    "Victoria",
-                                    "Waterloo & City"]
-    
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
     @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
     @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
@@ -161,12 +129,12 @@ struct TubeStatusWatchApp: App {
     
     var body: some Scene {
         let selectedLineIds = Binding(
-            get: { selectedLineIdsString.isEmpty ? [] : selectedLineIdsString.components(separatedBy: ",") },
-            set: { selectedLineIdsString = $0.joined(separator: ",") }
+            get: { selectedLineIdsString.componentsOrEmpty(separatedBy: ",") },
+            set: { selectedLineIdsString = $0.sorted(by: <).joined(separator: ",") }
         )
-        let lineSettings = Self.lineIds.enumerated().map { index, lineId in
+        let lineSettings = LineData.lineIds.enumerated().map { index, lineId in
             LineSetting(id: lineId,
-                        name: Self.lineNames[index],
+                        name: LineData.lineNames[index],
                         isSelected: selectedLineIds.wrappedValue.contains(lineId))
         }
         
@@ -192,6 +160,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate {
     func applicationDidEnterBackground() {
         let complicationServer = CLKComplicationServer.sharedInstance()
         complicationServer.activeComplications?.forEach(complicationServer.reloadTimeline)
+        complicationServer.reloadComplicationDescriptors()
     }
 }
 
