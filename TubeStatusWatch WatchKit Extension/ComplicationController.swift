@@ -131,8 +131,9 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                     complicationTemplate = CLKComplicationTemplateUtilitarianLargeFlat(textProvider: CLKTextProvider(format: "%@: %@",
                                                                                                                      lines.first!.name,
                                                                                                                      lines.first!.lineStatuses.first!.statusSeverityDescription))
-                case .extraLarge, .graphicCircular, .graphicExtraLarge: // extraLarge not tested
-                    complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: sliceViewModels))
+                case .extraLarge: // extraLarge not tested
+                    complicationTemplate = CLKComplicationTemplateExtraLargeStackText(line1TextProvider: CLKTextProvider(format: lines.first!.name),
+                                                                                      line2TextProvider: CLKTextProvider(format: lines.first!.lineStatuses.first!.statusSeverityDescription))
                 case .graphicCorner:
                     complicationTemplate = CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: lines.first!.name),
                                                                                         label: Label(title: {},
@@ -140,10 +141,14 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                 case .graphicBezel:
                     complicationTemplate = CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: sliceViewModels)),
                                                                                            textProvider: CLKTextProvider(format: lines.first!.name))
+                case .graphicCircular:
+                    complicationTemplate = CLKComplicationTemplateGraphicCircularView(CircularComplicationContentView(viewModels: sliceViewModels))
                 case .graphicRectangular:
                     complicationTemplate = CLKComplicationTemplateGraphicRectangularFullView(RectangularFullComplicationContentView(title: lines.first!.name,
                                                                                                                                     subtitle: (lines.first?.lineStatuses.first!.statusSeverityDescription)!,
                                                                                                                                     color: Color(lines.first!.id)))
+                case .graphicExtraLarge:
+                    complicationTemplate = CLKComplicationTemplateGraphicExtraLargeCircularView(CircularComplicationContentView(viewModels: sliceViewModels))
                 @unknown default:
                     complicationTemplate = nil
                 }
