@@ -89,8 +89,8 @@ struct LineUpdateItem: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             if let statusSeverityDescription = statusSeverityDescription {
                 Text(statusSeverityDescription)
-                    .foregroundColor(statusSeverityColor)
                     .font(.headline)
+                    .foregroundColor(statusSeverityColor)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
             if let reason = reason {

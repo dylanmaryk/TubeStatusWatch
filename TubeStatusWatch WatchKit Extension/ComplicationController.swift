@@ -47,6 +47,9 @@ struct LineStatus: Codable {
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
     
+    @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
+    @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
+    
     private var sessionCancellable: AnyCancellable?
     
     // MARK: - Complication Configuration
@@ -104,15 +107,11 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                     print(error.localizedDescription)
                 }
             } receiveValue: { lines in
-                guard let selectedLineIdsString = UserDefaults.standard.string(forKey: "selectedLineIds") else {
-                    // TODO: Handle no lines selected yet
-                    return
-                }
-                let selectedLineIds = selectedLineIdsString.isEmpty
+                let selectedLineIds = self.selectedLineIdsString.isEmpty
                     ? []
-                    : selectedLineIdsString.components(separatedBy: ",")
+                    : self.selectedLineIdsString.components(separatedBy: ",")
                 let selectedLines = lines.filter { selectedLineIds.contains($0.id) }
-                UserDefaults.standard.setValue(try! JSONEncoder().encode(selectedLines), forKey: "selectedLineUpdates")
+                self.selectedLineUpdatesData = try? JSONEncoder().encode(selectedLines)
                 let sliceViewModels = selectedLines.map { line -> CircularComplicationSliceViewModel in
                     let fillColor = Color(line.id)
                     let borderColor = StatusSeverityColorMapper.color(for: line.lineStatuses.first!.statusSeverity)
