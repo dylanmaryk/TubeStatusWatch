@@ -79,6 +79,7 @@ struct LineSettingList: View {
 struct LineUpdateItem: View {
     let name: String
     let statusSeverityDescription: String?
+    let statusSeverityColor: Color?
     let reason: String?
     
     var body: some View {
@@ -88,6 +89,7 @@ struct LineUpdateItem: View {
                 .frame(maxWidth: .infinity, alignment: .leading)
             if let statusSeverityDescription = statusSeverityDescription {
                 Text(statusSeverityDescription)
+                    .foregroundColor(statusSeverityColor)
                     .font(.headline)
                     .frame(maxWidth: .infinity, alignment: .leading)
             }
@@ -106,9 +108,13 @@ struct LineUpdateList: View {
     var body: some View {
         List {
             ForEach(lines) { line in
-                LineUpdateItem(name: line.name,
-                               statusSeverityDescription: line.lineStatuses.first?.statusSeverityDescription,
-                               reason: line.lineStatuses.first?.reason)
+                if let lineStatus = line.lineStatuses.first {
+                    LineUpdateItem(name: line.name,
+                                   statusSeverityDescription: lineStatus.statusSeverityDescription,
+                                   statusSeverityColor: StatusSeverityColorMapper
+                                    .color(for: lineStatus.statusSeverity),
+                                   reason: lineStatus.reason)
+                }
             }
         }
     }

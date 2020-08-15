@@ -115,7 +115,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                 UserDefaults.standard.setValue(try! JSONEncoder().encode(selectedLines), forKey: "selectedLineUpdates")
                 let sliceViewModels = selectedLines.map { line -> CircularComplicationSliceViewModel in
                     let fillColor = Color(line.id)
-                    let borderColor = self.sliceBorderColor(for: line.lineStatuses.first!.statusSeverity)
+                    let borderColor = StatusSeverityColorMapper.color(for: line.lineStatuses.first!.statusSeverity)
                     return CircularComplicationSliceViewModel(fillColor: fillColor, borderColor: borderColor)
                 }
                 let complicationTemplate: CLKComplicationTemplate?
@@ -169,37 +169,6 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                                       withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
         // TODO: Handle sample templates
         handler(nil)
-    }
-    
-    // MARK: - Helpers
-    
-    private func sliceBorderColor(for statusSeverity: StatusSeverity) -> Color {
-        switch statusSeverity {
-        case .goodService,
-             .noIssues:
-            return .green
-        case .specialService,
-             .partSuspended,
-             .reducedService,
-             .minorDelays,
-             .exitOnly,
-             .noStepFreeAccess,
-             .changeOfFrequency,
-             .issuesReported,
-             .information:
-            return .yellow
-        case .closed,
-             .suspended,
-             .plannedClosure,
-             .partClosure,
-             .severeDelays,
-             .busService,
-             .partClosed,
-             .diverted,
-             .notRunning,
-             .serviceClosed:
-            return .red
-        }
     }
     
 }

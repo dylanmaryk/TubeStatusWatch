@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		354C70B524E813AF00681798 /* StatusSeverityColorMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354C70B424E813AF00681798 /* StatusSeverityColorMapper.swift */; };
 		356663EA24A7C9510007DA72 /* TubeStatusWatch WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 356663E924A7C9510007DA72 /* TubeStatusWatch WatchKit App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		356663EF24A7C9530007DA72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 356663EE24A7C9530007DA72 /* Assets.xcassets */; };
 		356663F624A7C9530007DA72 /* TubeStatusWatch WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 356663F524A7C9530007DA72 /* TubeStatusWatch WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -60,6 +61,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		354C70B424E813AF00681798 /* StatusSeverityColorMapper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusSeverityColorMapper.swift; sourceTree = "<group>"; };
 		356663E524A7C9510007DA72 /* TubeStatusWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeStatusWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		356663E924A7C9510007DA72 /* TubeStatusWatch WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TubeStatusWatch WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		356663EE24A7C9530007DA72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -115,9 +117,10 @@
 		356663F924A7C9530007DA72 /* TubeStatusWatch WatchKit Extension */ = {
 			isa = PBXGroup;
 			children = (
-				356663FA24A7C9530007DA72 /* ContentView.swift */,
 				356663FC24A7C9530007DA72 /* TubeStatusWatchApp.swift */,
+				356663FA24A7C9530007DA72 /* ContentView.swift */,
 				356663FE24A7C9530007DA72 /* ComplicationController.swift */,
+				354C70B424E813AF00681798 /* StatusSeverityColorMapper.swift */,
 				3566640024A7C9540007DA72 /* Assets.xcassets */,
 				3566640524A7C9540007DA72 /* Info.plist */,
 				3566640224A7C9540007DA72 /* Preview Content */,
@@ -260,6 +263,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				356663FB24A7C9530007DA72 /* ContentView.swift in Sources */,
+				354C70B524E813AF00681798 /* StatusSeverityColorMapper.swift in Sources */,
 				356663FD24A7C9530007DA72 /* TubeStatusWatchApp.swift in Sources */,
 				356663FF24A7C9530007DA72 /* ComplicationController.swift in Sources */,
 			);
