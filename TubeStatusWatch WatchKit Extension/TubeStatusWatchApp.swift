@@ -172,22 +172,10 @@ struct TubeStatusWatchApp_Previews: PreviewProvider {
             get: { ["bakerloo"] },
             set: { _ in }
         )
-        let goodServiceLineStatus = LineStatus(statusSeverity: .goodService,
-                                               statusSeverityDescription: "Good Service",
-                                               reason: "Good Service reason")
-        let specialServiceLineStatus = LineStatus(statusSeverity: .specialService,
-                                                  statusSeverityDescription: "Special Service",
-                                                  reason: "Special Service reason")
-        let closedLineStatus = LineStatus(statusSeverity: .closed,
-                                          statusSeverityDescription: "Closed",
-                                          reason: "Closed reason")
-        let lines = [Line(id: "bakerloo", name: "Bakerloo", lineStatuses: [goodServiceLineStatus]),
-                     Line(id: "central", name: "Central", lineStatuses: [specialServiceLineStatus]),
-                     Line(id: "circle", name: "Circle", lineStatuses: [closedLineStatus])]
         
         Group {
             LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineSettingIds)
-            LineUpdateList(lines: lines)
+            LineUpdateList(lines: .samples)
         }
     }
 }

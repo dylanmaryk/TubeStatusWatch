@@ -138,8 +138,12 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     func getLocalizableSampleTemplate(for complication: CLKComplication,
                                       withHandler handler: @escaping (CLKComplicationTemplate?) -> Void) {
-        // TODO: Handle sample templates
-        handler(nil)
+        if let sampleLines = sampleLines(for: complication),
+           let complicationTemplate = complicationTemplate(for: complication.family, and: sampleLines) {
+            handler(complicationTemplate)
+        } else {
+            handler(nil)
+        }
     }
     
     // MARK: - Complication Descriptor Helpers
@@ -174,25 +178,37 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                                          ])
     }
     
-    // MARK: - Timeline Entry Helpers
+    // MARK: - Complication Creation Helpers
     
     private func visibleLines(for complication: CLKComplication,
                               allLines: [Line],
                               selectedLines: [Line]) -> [Line] {
-        guard let complicationIdentifierPrefix = complication.identifier.components(separatedBy: "-").first else {
-            fatalError("Failed to get complication identifier prefix")
-        }
-        switch ComplicationIdentifier(rawValue: complicationIdentifierPrefix) {
+        switch ComplicationIdentifier(rawValue: complication.identifierPrefix) {
         case .onlyLineComplication:
             return [selectedLines.first].compactMap { $0 }
         case .singleLineComplication:
-            let complicationLineId = complication.userInfo?["lineId"] as? String
-            let line = allLines.first { $0.id == complicationLineId }
+            let lineId = complication.userInfo?["lineId"] as? String
+            let line = allLines.first { $0.id == lineId }
             return [line].compactMap { $0 }
         case .multipleLineComplication:
             return selectedLines
         case .none:
             fatalError("Unrecognized complication")
+        }
+    }
+    
+    private func sampleLines(for complication: CLKComplication) -> [Line]? {
+        switch ComplicationIdentifier(rawValue: complication.identifierPrefix) {
+        case .onlyLineComplication, .singleLineComplication:
+            guard let lineId = complication.userInfo?["lineId"] as? String,
+                  let lineName = LineData.lineIdsToNames[lineId] else {
+                return nil
+            }
+            return [Line(id: lineId, name: lineName, lineStatuses: [.sampleGoodService])]
+        case .multipleLineComplication:
+            return .samples
+        case .none:
+            return nil
         }
     }
     
