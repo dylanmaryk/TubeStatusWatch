@@ -113,15 +113,6 @@ struct CircularComplicationContentView: View {
     }
 }
 
-struct CornerTextIconComplicationContentView: View {
-    let color: Color
-    
-    var body: some View {
-        Circle()
-            .fill(color)
-    }
-}
-
 struct RectangularFullComplicationContentView: View {
     let title: String
     let subtitle: String
@@ -142,73 +133,32 @@ struct RectangularFullComplicationContentView: View {
     }
 }
 
-struct RectangularLargeComplicationContentView: View {
-    let title: String
-    let color: Color
-    
-    var body: some View {
-        ZStack {
-            RoundedRectangle(cornerRadius: 25, style: .continuous)
-                .fill(color)
-                .transition(.slide)
-            VStack {
-                Text(title)
-                    .font(.headline)
-            }
-        }
-    }
-}
-
 struct ContentView_Previews: PreviewProvider {
-    private static let circularOneLineContentView = CircularComplicationContentView(viewModels: [CircularComplicationSliceViewModel(fillColor: Color("bakerloo"),
-                                                                                                                                    borderColor: .green)])
-    private static let circularTwoLinesContentView = CircularComplicationContentView(viewModels: [CircularComplicationSliceViewModel(fillColor: Color("bakerloo"),
-                                                                                                                                     borderColor: .green),
-                                                                                                  CircularComplicationSliceViewModel(fillColor: Color("central"),
-                                                                                                                                     borderColor: .yellow)])
-    private static let circularThreeLinesContentView = CircularComplicationContentView(viewModels: [CircularComplicationSliceViewModel(fillColor: Color("bakerloo"),
-                                                                                                                                       borderColor: .green),
-                                                                                                    CircularComplicationSliceViewModel(fillColor: Color("central"),
-                                                                                                                                       borderColor: .yellow),
-                                                                                                    CircularComplicationSliceViewModel(fillColor: Color("circle"),
-                                                                                                                                       borderColor: .red)])
-    private static let rectangularFullContentView = RectangularFullComplicationContentView(title: "Bakerloo",
-                                                                                           subtitle: "Good Service",
-                                                                                           color: Color("bakerloo"))
-    private static let rectangularLargeContentView = RectangularLargeComplicationContentView(title: "Good Service",
-                                                                                             color: Color("bakerloo"))
-    private static let cornerTextIconGreenContentView = CornerTextIconComplicationContentView(color: .green)
-    private static let cornerTextIconRedContentView = CornerTextIconComplicationContentView(color: .red)
-    
     static var previews: some View {
+        let firstSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("bakerloo"),
+                                                                     borderColor: .green)
+        let secondSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("central"),
+                                                                      borderColor: .yellow)
+        let thirdSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("circle"),
+                                                                     borderColor: .red)
+        let circularOneLineContentView = CircularComplicationContentView(viewModels: [firstSliceViewModel])
+        let circularTwoLinesContentView = CircularComplicationContentView(viewModels: [firstSliceViewModel,
+                                                                                       secondSliceViewModel])
+        let circularThreeLinesContentView = CircularComplicationContentView(viewModels: [firstSliceViewModel,
+                                                                                         secondSliceViewModel,
+                                                                                         thirdSliceViewModel])
+        let rectangularFullContentView = RectangularFullComplicationContentView(title: "Bakerloo",
+                                                                                subtitle: "Good Service",
+                                                                                color: Color("bakerloo"))
+        
         Group {
-            CLKComplicationTemplateGraphicCircularStackViewText(content: circularOneLineContentView,
-                                                                textProvider: CLKTextProvider(format: "Good"))
+            CLKComplicationTemplateGraphicExtraLargeCircularView(circularOneLineContentView)
                 .previewContext()
-            CLKComplicationTemplateGraphicCircularView(circularThreeLinesContentView)
-                .previewContext()
-            CLKComplicationTemplateGraphicCornerCircularView(circularThreeLinesContentView)
-                .previewContext()
-            CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "✅ Bakerloo"),
-                                                         label: Label(title: {}, icon: {}))
-                .previewContext()
-            CLKComplicationTemplateGraphicCornerTextView(textProvider: CLKTextProvider(format: "❌ Bakerloo"),
-                                                         label: Label(title: {}, icon: {}))
-                .previewContext()
-            CLKComplicationTemplateGraphicExtraLargeCircularStackViewText(content: circularOneLineContentView,
-                                                                          textProvider: CLKTextProvider(format: "Good"))
+            CLKComplicationTemplateGraphicExtraLargeCircularView(circularTwoLinesContentView)
                 .previewContext()
             CLKComplicationTemplateGraphicExtraLargeCircularView(circularThreeLinesContentView)
                 .previewContext()
             CLKComplicationTemplateGraphicRectangularFullView(rectangularFullContentView)
-                .previewContext()
-            CLKComplicationTemplateGraphicRectangularLargeView(headerTextProvider: CLKTextProvider(format: "Bakerloo"),
-                                                               content: rectangularLargeContentView)
-                .previewContext()
-            CLKComplicationTemplateGraphicRectangularStandardBodyView(headerLabel: Label(title: {},
-                                                                                         icon: { cornerTextIconGreenContentView }),
-                                                                      headerTextProvider: CLKTextProvider(format: "Bakerloo"),
-                                                                      body1TextProvider: CLKTextProvider(format: "Good Service"))
                 .previewContext()
         }
     }
