@@ -111,8 +111,7 @@ struct LineUpdateList: View {
                 if let lineStatus = line.lineStatuses.first {
                     LineUpdateItem(name: line.name,
                                    statusSeverityDescription: lineStatus.statusSeverityDescription,
-                                   statusSeverityColor: StatusSeverityColorMapper
-                                    .color(for: lineStatus.statusSeverity),
+                                   statusSeverityColor: StatusSeverityMapper.color(for: lineStatus.statusSeverity),
                                    reason: lineStatus.reason)
                 }
             }

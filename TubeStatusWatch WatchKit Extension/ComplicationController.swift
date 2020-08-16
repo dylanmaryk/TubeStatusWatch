@@ -201,6 +201,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         let firstLine = lines.first
         let firstLineId = firstLine?.id
         let firstLineName = firstLine?.name
+        let firstLineStatusSeverity = firstLine?.lineStatuses.first?.statusSeverity
         let firstLineStatusSeverityDescription = firstLine?.lineStatuses.first?.statusSeverityDescription
         switch complicationFamily {
         case .modularSmall, .circularSmall:
@@ -213,9 +214,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             return CLKComplicationTemplateModularLargeStandardBody(headerTextProvider: headerTextProvider,
                                                                    body1TextProvider: body1TextProvider)
         case .utilitarianSmall, .utilitarianSmallFlat:
-            guard let lineName = firstLineName else { return nil }
+            guard let lineName = firstLineName, let statusSeverity = firstLineStatusSeverity else { return nil }
+            let onePieceImage = UIImage(systemName: StatusSeverityMapper.systemImageName(for: statusSeverity))
             let textProvider = CLKTextProvider(format: lineName)
-            let imageProvider = CLKImageProvider(onePieceImage: UIImage(systemName: "checkmark")!)
+            let imageProvider = CLKImageProvider(onePieceImage: onePieceImage!)
             return CLKComplicationTemplateUtilitarianSmallFlat(textProvider: textProvider,
                                                                imageProvider: imageProvider)
         case .utilitarianLarge:
@@ -231,9 +233,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             return CLKComplicationTemplateExtraLargeStackText(line1TextProvider: line1TextProvider,
                                                               line2TextProvider: line2TextProvider)
         case .graphicCorner:
-            guard let lineName = firstLineName else { return nil }
+            guard let lineName = firstLineName, let statusSeverity = firstLineStatusSeverity else { return nil }
+            let icon = Image(systemName: StatusSeverityMapper.systemImageName(for: statusSeverity))
             let textProvider = CLKTextProvider(format: lineName)
-            let label = Label(title: {}, icon: { Image(systemName: "checkmark") })
+            let label = Label(title: {}, icon: { icon })
             return CLKComplicationTemplateGraphicCornerTextView(textProvider: textProvider, label: label)
         case .graphicBezel:
             guard let lineName = firstLineName,
@@ -269,7 +272,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         return lines.compactMap { line in
             guard let lineStatus = line.lineStatuses.first else { return nil }
             let fillColor = Color(line.id)
-            let borderColor = StatusSeverityColorMapper.color(for: lineStatus.statusSeverity)
+            let borderColor = StatusSeverityMapper.color(for: lineStatus.statusSeverity)
             return CircularComplicationSliceViewModel(fillColor: fillColor, borderColor: borderColor)
         }
     }
