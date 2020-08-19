@@ -140,15 +140,14 @@ struct TubeStatusWatchApp: App {
         WindowGroup {
             LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds)
                 .onAppear {
-                    isSheetPresented = selectedLineUpdatesData != nil
+                    isSheetPresented = !(selectedLineUpdatesData?.decoded(to: [Line].self)?.isEmpty ?? true)
                 }
-                .onChange(of: selectedLineUpdatesData) { value in
-                    isSheetPresented = value != nil
+                .onChange(of: selectedLineUpdatesData) { data in
+                    isSheetPresented = !(data?.decoded(to: [Line].self)?.isEmpty ?? true)
                 }
                 .sheet(isPresented: $isSheetPresented, onDismiss: { selectedLineUpdatesData = nil }) {
-                    if let selectedLineUpdatesData = selectedLineUpdatesData,
-                       let selectedLines = try? JSONDecoder().decode([Line].self, from: selectedLineUpdatesData) {
-                        LineUpdateList(lines: selectedLines)
+                    if let lines = selectedLineUpdatesData?.decoded(to: [Line].self) {
+                        LineUpdateList(lines: lines)
                     }
                 }
         }
