@@ -39,7 +39,7 @@ enum StatusSeverity: Int, Codable {
     case serviceClosed
 }
 
-struct LineStatus: Codable {
+struct LineStatus: Codable, Hashable {
     let statusSeverity: StatusSeverity
     let statusSeverityDescription: String
     let reason: String?

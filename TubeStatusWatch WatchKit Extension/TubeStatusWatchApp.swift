@@ -76,27 +76,40 @@ struct LineSettingList: View {
     }
 }
 
-struct LineUpdateItem: View {
-    let name: String
+struct LineUpdateItemStatusSeverity: View {
     let statusSeverityDescription: String?
     let statusSeverityColor: Color?
     let reason: String?
+    
+    var body: some View {
+        if let statusSeverityDescription = statusSeverityDescription {
+            Text(statusSeverityDescription)
+                .font(.headline)
+                .foregroundColor(statusSeverityColor)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+        if let reason = reason {
+            Text(reason)
+                .font(.body)
+                .frame(maxWidth: .infinity, alignment: .leading)
+        }
+    }
+}
+
+struct LineUpdateItem: View {
+    let name: String
+    let lineStatuses: [LineStatus]
     
     var body: some View {
         VStack {
             Text(name)
                 .font(.title3)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            if let statusSeverityDescription = statusSeverityDescription {
-                Text(statusSeverityDescription)
-                    .font(.headline)
-                    .foregroundColor(statusSeverityColor)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-            }
-            if let reason = reason {
-                Text(reason)
-                    .font(.body)
-                    .frame(maxWidth: .infinity, alignment: .leading)
+            ForEach(lineStatuses, id: \.self) { lineStatus in
+                LineUpdateItemStatusSeverity(statusSeverityDescription: lineStatus.statusSeverityDescription,
+                                             statusSeverityColor: StatusSeverityMapper
+                                                .color(for: lineStatus.statusSeverity),
+                                             reason: lineStatus.reason)
             }
         }
     }
@@ -108,11 +121,8 @@ struct LineUpdateList: View {
     var body: some View {
         List {
             ForEach(lines) { line in
-                if let lineStatus = line.lineStatuses.first {
-                    LineUpdateItem(name: line.name,
-                                   statusSeverityDescription: lineStatus.statusSeverityDescription,
-                                   statusSeverityColor: StatusSeverityMapper.color(for: lineStatus.statusSeverity),
-                                   reason: lineStatus.reason)
+                if !line.lineStatuses.isEmpty {
+                    LineUpdateItem(name: line.name, lineStatuses: line.lineStatuses)
                 }
             }
         }
@@ -121,9 +131,9 @@ struct LineUpdateList: View {
 
 @main
 struct TubeStatusWatchApp: App {
+    @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
     @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
-    @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
     @State private var isSheetPresented = false
     
     var body: some Scene {
