@@ -111,7 +111,14 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             .map { $0.data }
             .decode(type: [Line].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
-            .sink { _ in } receiveValue: { lines in
+            .sink { completion in
+                switch completion {
+                case .finished:
+                    break
+                case .failure:
+                    handler(nil)
+                }
+            } receiveValue: { lines in
                 let selectedLineIds = self.selectedLineIdsString.componentsOrEmpty(separatedBy: ",")
                 let selectedLines = lines.filter { selectedLineIds.contains($0.id) }
                 self.selectedLineUpdatesData = try? JSONEncoder().encode(selectedLines)

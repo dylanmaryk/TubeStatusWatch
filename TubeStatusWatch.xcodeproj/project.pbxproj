@@ -437,6 +437,7 @@
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"TubeStatusWatch WatchKit Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "TubeStatusWatch WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -460,6 +461,7 @@
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_ASSET_PATHS = "\"TubeStatusWatch WatchKit Extension/Preview Content\"";
+				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				ENABLE_PREVIEWS = YES;
 				INFOPLIST_FILE = "TubeStatusWatch WatchKit Extension/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -484,6 +486,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				IBSC_MODULE = TubeStatusWatch_WatchKit_Extension;
 				INFOPLIST_FILE = "TubeStatusWatch WatchKit App/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch.watchkitapp;
@@ -503,6 +506,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				IBSC_MODULE = TubeStatusWatch_WatchKit_Extension;
 				INFOPLIST_FILE = "TubeStatusWatch WatchKit App/Info.plist";
 				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch.watchkitapp;
@@ -521,6 +525,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
@@ -534,6 +539,7 @@
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				MARKETING_VERSION = 1.0;
 				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
