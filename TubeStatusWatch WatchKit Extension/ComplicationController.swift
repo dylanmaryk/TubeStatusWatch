@@ -15,44 +15,7 @@ enum ComplicationIdentifier: String {
     case multipleLineComplication
 }
 
-enum StatusSeverity: Int, Codable {
-    case specialService
-    case closed
-    case suspended
-    case partSuspended
-    case plannedClosure
-    case partClosure
-    case severeDelays
-    case reducedService
-    case busService
-    case minorDelays
-    case goodService
-    case partClosed
-    case exitOnly
-    case noStepFreeAccess
-    case changeOfFrequency
-    case diverted
-    case notRunning
-    case issuesReported
-    case noIssues
-    case information
-    case serviceClosed
-}
-
-struct LineStatus: Codable, Hashable {
-    let statusSeverity: StatusSeverity
-    let statusSeverityDescription: String
-    let reason: String?
-}
-
-struct Line: Codable, Identifiable {
-    let id: String
-    let name: String
-    let lineStatuses: [LineStatus]
-}
-
 class ComplicationController: NSObject, CLKComplicationDataSource {
-    
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
     @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
     
@@ -262,12 +225,15 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             let label = Label(title: {}, icon: { icon })
             return CLKComplicationTemplateGraphicCornerTextView(textProvider: textProvider, label: label)
         case .graphicBezel:
-            guard let lineName = firstLineName,
-                  let statusSeverityDescription = firstLineStatusSeverityDescription else { return nil }
             let sliceViewModels = self.sliceViewModels(for: lines)
             let contentView = CircularComplicationContentView(viewModels: sliceViewModels)
             let circularTemplate = CLKComplicationTemplateGraphicCircularView(contentView)
-            let textProvider = CLKTextProvider(format: "%@: %@", lineName, statusSeverityDescription)
+            let textProvider: CLKTextProvider?
+            if let lineName = firstLineName, let statusSeverityDescription = firstLineStatusSeverityDescription {
+                textProvider = CLKTextProvider(format: "%@: %@", lineName, statusSeverityDescription)
+            } else {
+                textProvider = nil
+            }
             return CLKComplicationTemplateGraphicBezelCircularText(circularTemplate: circularTemplate,
                                                                    textProvider: textProvider)
         case .graphicCircular:
@@ -293,11 +259,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     private func sliceViewModels(for lines: [Line]) -> [CircularComplicationSliceViewModel] {
         return lines.compactMap { line in
-            guard let lineStatus = line.lineStatuses.first else { return nil }
+            guard let mostSevereLineStatus = line.mostSevereLineStatus else { return nil }
             let fillColor = Color(line.id)
-            let borderColor = StatusSeverityMapper.color(for: lineStatus.statusSeverity)
+            let borderColor = StatusSeverityMapper.color(for: mostSevereLineStatus.statusSeverity)
             return CircularComplicationSliceViewModel(fillColor: fillColor, borderColor: borderColor)
         }
     }
-    
 }

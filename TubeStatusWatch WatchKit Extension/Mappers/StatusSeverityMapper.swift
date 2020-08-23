@@ -7,13 +7,13 @@
 
 import SwiftUI
 
+enum StatusLevel: Comparable {
+    case good
+    case ok
+    case bad
+}
+
 enum StatusSeverityMapper {
-    private enum StatusLevel {
-        case good
-        case ok
-        case bad
-    }
-    
     static func color(for statusSeverity: StatusSeverity) -> Color {
         switch Self.statusLevel(for: statusSeverity) {
         case .good:
@@ -36,7 +36,7 @@ enum StatusSeverityMapper {
         }
     }
     
-    private static func statusLevel(for statusSeverity: StatusSeverity) -> StatusLevel {
+    static func statusLevel(for statusSeverity: StatusSeverity) -> StatusLevel {
         switch statusSeverity {
         case .goodService,
              .noIssues:

@@ -1,9 +1,24 @@
 //
-//  Lines+Samples.swift
+//  Line.swift
 //  TubeStatusWatch WatchKit Extension
 //
-//  Created by Dylan Maryk on 16/08/2020.
+//  Created by Dylan Maryk on 23/08/2020.
 //
+
+struct Line: Codable, Identifiable {
+    let id: String
+    let name: String
+    let lineStatuses: [LineStatus]
+}
+
+extension Line {
+    var mostSevereLineStatus: LineStatus? {
+        lineStatuses.sorted {
+            StatusSeverityMapper.statusLevel(for: $0.statusSeverity)
+                > StatusSeverityMapper.statusLevel(for: $1.statusSeverity)
+        }.first
+    }
+}
 
 extension Array where Element == Line {
     static var samples: [Line] {

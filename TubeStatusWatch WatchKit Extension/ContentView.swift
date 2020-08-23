@@ -26,13 +26,13 @@ struct PieChartSliceViewModel: Hashable {
     let borderColor: Color
 }
 
-class PieChartData {
-    let viewModels: [PieChartSliceViewModel]
+class PieChartViewModel {
+    let sliceViewModels: [PieChartSliceViewModel]
     
     init(data: [PieChartSliceData]) {
         let totalValue = data.reduce(0) { $0 + $1.value }
         var currentAngle = -90.0
-        viewModels = data.map {
+        sliceViewModels = data.map {
             let startAngle = Angle(degrees: currentAngle)
             let angle = $0.value * 360 / totalValue
             currentAngle += angle
@@ -51,7 +51,7 @@ struct PieChartSlice: View {
     let geometry: GeometryProxy
     let viewModel: PieChartSliceViewModel
     
-    var borderPath: Path {
+    private var borderPath: Path {
         let chartSize = geometry.size.width
         let radius = chartSize / 2
         let centerX = radius
@@ -66,7 +66,7 @@ struct PieChartSlice: View {
         return path
     }
     
-    var arcPath: Path {
+    private var arcPath: Path {
         let chartSize = geometry.size.width
         let radius = chartSize / 2
         let centerX = radius
@@ -88,12 +88,12 @@ struct PieChartSlice: View {
 }
 
 struct PieChart: View {
-    let data: PieChartData
+    let viewModel: PieChartViewModel
     
     var body: some View {
         GeometryReader { geometry in
             ZStack {
-                ForEach(data.viewModels, id: \.self) { viewModel in
+                ForEach(viewModel.sliceViewModels, id: \.self) { viewModel in
                     PieChartSlice(geometry: geometry, viewModel: viewModel)
                 }
             }
@@ -104,12 +104,12 @@ struct PieChart: View {
 struct CircularComplicationContentView: View {
     let viewModels: [CircularComplicationSliceViewModel]
     
-    var pieChartSliceData: [PieChartSliceData] {
+    private var pieChartSliceData: [PieChartSliceData] {
         viewModels.map { PieChartSliceData(value: 1, fillColor: $0.fillColor, borderColor: $0.borderColor) }
     }
     
     var body: some View {
-        PieChart(data: PieChartData(data: pieChartSliceData))
+        PieChart(viewModel: PieChartViewModel(data: pieChartSliceData))
     }
 }
 
