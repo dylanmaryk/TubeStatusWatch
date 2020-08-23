@@ -74,7 +74,7 @@
 		3556362524F292EF00D6EF79 /* LineSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineSetting.swift; sourceTree = "<group>"; };
 		3556362824F2943800D6EF79 /* Line.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
 		3556362C24F2944F00D6EF79 /* LineStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStatus.swift; sourceTree = "<group>"; };
-		356663E524A7C9510007DA72 /* TubeStatusWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeStatusWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		356663E524A7C9510007DA72 /* TubeStatus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeStatus.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		356663E924A7C9510007DA72 /* TubeStatusWatch WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TubeStatusWatch WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		356663EE24A7C9530007DA72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		356663F024A7C9530007DA72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -131,7 +131,7 @@
 		356663E624A7C9510007DA72 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				356663E524A7C9510007DA72 /* TubeStatusWatch.app */,
+				356663E524A7C9510007DA72 /* TubeStatus.app */,
 				356663E924A7C9510007DA72 /* TubeStatusWatch WatchKit App.app */,
 				356663F524A7C9530007DA72 /* TubeStatusWatch WatchKit Extension.appex */,
 			);
@@ -198,7 +198,7 @@
 			);
 			name = TubeStatusWatch;
 			productName = TubeStatusWatch;
-			productReference = 356663E524A7C9510007DA72 /* TubeStatusWatch.app */;
+			productReference = 356663E524A7C9510007DA72 /* TubeStatus.app */;
 			productType = "com.apple.product-type.application.watchapp2-container";
 		};
 		356663E824A7C9510007DA72 /* TubeStatusWatch WatchKit App */ = {
