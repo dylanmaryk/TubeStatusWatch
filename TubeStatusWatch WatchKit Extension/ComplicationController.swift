@@ -16,6 +16,8 @@ enum ComplicationIdentifier: String {
 }
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
+    private static let urlString = "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status"
+    
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
     @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
     
@@ -70,7 +72,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     func getCurrentTimelineEntry(for complication: CLKComplication,
                                  withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
         sessionCancellable = URLSession.shared
-            .dataTaskPublisher(for: URL(string: "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status")!)
+            .dataTaskPublisher(for: URL(string: Self.urlString)!)
             .map { $0.data }
             .decode(type: [Line].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
@@ -187,20 +189,22 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         let firstLine = lines.first
         let firstLineId = firstLine?.id
         let firstLineName = firstLine?.name
-        let firstLineStatusSeverity = firstLine?.lineStatuses.first?.statusSeverity
-        let firstLineStatusSeverityDescription = firstLine?.lineStatuses.first?.statusSeverityDescription
+        let firstLineMostSevereLineStatus = firstLine?.mostSevereLineStatus
+        let firstLineMostSevereStatusSeverity = firstLineMostSevereLineStatus?.statusSeverity
+        let firstLineMostSevereStatusSeverityDescription = firstLineMostSevereLineStatus?.statusSeverityDescription
         switch complicationFamily {
         case .modularSmall, .circularSmall:
             return nil
         case .modularLarge:
             guard let lineName = firstLineName,
-                  let statusSeverityDescription = firstLineStatusSeverityDescription else { return nil }
+                  let statusSeverityDescription = firstLineMostSevereStatusSeverityDescription else { return nil }
             let headerTextProvider = CLKTextProvider(format: lineName)
             let body1TextProvider = CLKTextProvider(format: statusSeverityDescription)
             return CLKComplicationTemplateModularLargeStandardBody(headerTextProvider: headerTextProvider,
                                                                    body1TextProvider: body1TextProvider)
         case .utilitarianSmall, .utilitarianSmallFlat:
-            guard let lineName = firstLineName, let statusSeverity = firstLineStatusSeverity else { return nil }
+            guard let lineName = firstLineName,
+                  let statusSeverity = firstLineMostSevereStatusSeverity else { return nil }
             let onePieceImage = UIImage(systemName: StatusSeverityMapper.systemImageName(for: statusSeverity))
             let textProvider = CLKTextProvider(format: lineName)
             let imageProvider = CLKImageProvider(onePieceImage: onePieceImage!)
@@ -208,18 +212,19 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                                                                imageProvider: imageProvider)
         case .utilitarianLarge:
             guard let lineName = firstLineName,
-                  let statusSeverityDescription = firstLineStatusSeverityDescription else { return nil }
+                  let statusSeverityDescription = firstLineMostSevereStatusSeverityDescription else { return nil }
             let textProvider = CLKTextProvider(format: "%@: %@", lineName, statusSeverityDescription)
             return CLKComplicationTemplateUtilitarianLargeFlat(textProvider: textProvider)
         case .extraLarge: // not tested
             guard let lineName = firstLineName,
-                  let statusSeverityDescription = firstLineStatusSeverityDescription else { return nil }
+                  let statusSeverityDescription = firstLineMostSevereStatusSeverityDescription else { return nil }
             let line1TextProvider = CLKTextProvider(format: lineName)
             let line2TextProvider = CLKTextProvider(format: statusSeverityDescription)
             return CLKComplicationTemplateExtraLargeStackText(line1TextProvider: line1TextProvider,
                                                               line2TextProvider: line2TextProvider)
         case .graphicCorner:
-            guard let lineName = firstLineName, let statusSeverity = firstLineStatusSeverity else { return nil }
+            guard let lineName = firstLineName,
+                  let statusSeverity = firstLineMostSevereStatusSeverity else { return nil }
             let icon = Image(systemName: StatusSeverityMapper.systemImageName(for: statusSeverity))
             let textProvider = CLKTextProvider(format: lineName)
             let label = Label(title: {}, icon: { icon })
@@ -229,7 +234,11 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             let contentView = CircularComplicationContentView(viewModels: sliceViewModels)
             let circularTemplate = CLKComplicationTemplateGraphicCircularView(contentView)
             let textProvider: CLKTextProvider?
-            if let lineName = firstLineName, let statusSeverityDescription = firstLineStatusSeverityDescription {
+            if let lineName = lines.mostSevereLine?.name,
+               let statusSeverityDescription = lines
+                .mostSevereLine?
+                .mostSevereLineStatus?
+                .statusSeverityDescription {
                 textProvider = CLKTextProvider(format: "%@: %@", lineName, statusSeverityDescription)
             } else {
                 textProvider = nil
@@ -243,7 +252,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         case .graphicRectangular:
             guard let lineId = firstLineId,
                   let lineName = firstLineName,
-                  let statusSeverityDescription = firstLineStatusSeverityDescription else { return nil }
+                  let statusSeverityDescription = firstLineMostSevereStatusSeverityDescription else { return nil }
             let contentView = RectangularFullComplicationContentView(title: lineName,
                                                                      subtitle: statusSeverityDescription,
                                                                      color: Color(lineId))

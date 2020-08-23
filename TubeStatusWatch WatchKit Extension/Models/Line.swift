@@ -21,6 +21,14 @@ extension Line {
 }
 
 extension Array where Element == Line {
+    var mostSevereLine: Line? {
+        filter { $0.mostSevereLineStatus != nil }
+            .sorted {
+                StatusSeverityMapper.statusLevel(for: $0.mostSevereLineStatus!.statusSeverity)
+                    > StatusSeverityMapper.statusLevel(for: $1.mostSevereLineStatus!.statusSeverity)
+            }.first
+    }
+    
     static var samples: [Line] {
         let lineIds = LineData.lineIds
         let lineNames = LineData.lineNames
