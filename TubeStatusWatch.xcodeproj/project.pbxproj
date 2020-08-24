@@ -74,7 +74,7 @@
 		3556362524F292EF00D6EF79 /* LineSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineSetting.swift; sourceTree = "<group>"; };
 		3556362824F2943800D6EF79 /* Line.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
 		3556362C24F2944F00D6EF79 /* LineStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStatus.swift; sourceTree = "<group>"; };
-		356663E524A7C9510007DA72 /* TubeStatus.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeStatus.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		356663E524A7C9510007DA72 /* TubeStatusWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeStatusWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		356663E924A7C9510007DA72 /* TubeStatusWatch WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TubeStatusWatch WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		356663EE24A7C9530007DA72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		356663F024A7C9530007DA72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -85,6 +85,7 @@
 		3566640024A7C9540007DA72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3566640324A7C9540007DA72 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3566640524A7C9540007DA72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		35B98AF524F4528700B138E8 /* Keys.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Keys.xcconfig; sourceTree = "<group>"; };
 		35C0D04924E9769C00A7539A /* Complication+IdentifierPrefix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Complication+IdentifierPrefix.swift"; sourceTree = "<group>"; };
 		35C86F3A24ED959500EF4EF1 /* Data+Decoded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Decoded.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -131,7 +132,7 @@
 		356663E624A7C9510007DA72 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				356663E524A7C9510007DA72 /* TubeStatus.app */,
+				356663E524A7C9510007DA72 /* TubeStatusWatch.app */,
 				356663E924A7C9510007DA72 /* TubeStatusWatch WatchKit App.app */,
 				356663F524A7C9530007DA72 /* TubeStatusWatch WatchKit Extension.appex */,
 			);
@@ -153,11 +154,12 @@
 				356663FC24A7C9530007DA72 /* TubeStatusWatchApp.swift */,
 				356663FA24A7C9530007DA72 /* ContentView.swift */,
 				356663FE24A7C9530007DA72 /* ComplicationController.swift */,
-				3566640024A7C9540007DA72 /* Assets.xcassets */,
-				3566640524A7C9540007DA72 /* Info.plist */,
 				35C0D04824E96A0B00A7539A /* Extensions */,
 				3556362724F2934F00D6EF79 /* Mappers */,
 				3556362424F292DC00D6EF79 /* Models */,
+				3566640024A7C9540007DA72 /* Assets.xcassets */,
+				3566640524A7C9540007DA72 /* Info.plist */,
+				35B98AF524F4528700B138E8 /* Keys.xcconfig */,
 				3566640224A7C9540007DA72 /* Preview Content */,
 			);
 			path = "TubeStatusWatch WatchKit Extension";
@@ -198,7 +200,7 @@
 			);
 			name = TubeStatusWatch;
 			productName = TubeStatusWatch;
-			productReference = 356663E524A7C9510007DA72 /* TubeStatus.app */;
+			productReference = 356663E524A7C9510007DA72 /* TubeStatusWatch.app */;
 			productType = "com.apple.product-type.application.watchapp2-container";
 		};
 		356663E824A7C9510007DA72 /* TubeStatusWatch WatchKit App */ = {
@@ -453,6 +455,7 @@
 		};
 		3566640924A7C9540007DA72 /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 35B98AF524F4528700B138E8 /* Keys.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_STYLE = Automatic;
@@ -477,6 +480,7 @@
 		};
 		3566640A24A7C9540007DA72 /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 35B98AF524F4528700B138E8 /* Keys.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_STYLE = Automatic;

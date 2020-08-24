@@ -10,13 +10,13 @@ import Combine
 import SwiftUI
 
 enum ComplicationIdentifier: String {
-    case onlyLineComplication
-    case singleLineComplication
-    case multipleLineComplication
+    case onlyLine
+    case singleLine
+    case multipleLine
 }
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
-    private static let urlString = "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status"
+    private static let urlString = "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status?app_key=%@"
     
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
     @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
@@ -31,7 +31,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
         if selectedLineIds.count == 1,
            let lineId = selectedLineIds.first,
            let lineName = LineData.lineIdsToNames[lineId] {
-            let identifier = ComplicationIdentifier.onlyLineComplication.rawValue
+            let identifier = ComplicationIdentifier.onlyLine.rawValue
             let onlyLineDescriptor = singleLineComplicationDescriptor(identifier: identifier,
                                                                       lineName: lineName,
                                                                       lineId: lineId)
@@ -41,7 +41,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             let singleLineDescriptors = selectedLineIds
                 .compactMap { lineId -> CLKComplicationDescriptor? in
                     guard let lineName = LineData.lineIdsToNames[lineId] else { return nil }
-                    let identifierPrefix = ComplicationIdentifier.singleLineComplication.rawValue
+                    let identifierPrefix = ComplicationIdentifier.singleLine.rawValue
                     return singleLineComplicationDescriptor(identifier: "\(identifierPrefix)-\(lineId)",
                                                             lineName: lineName,
                                                             lineId: lineId)
@@ -59,7 +59,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     func getTimelineEndDate(for complication: CLKComplication,
                             withHandler handler: @escaping (Date?) -> Void) {
-        handler(Date())
+        handler(nil)
     }
     
     func getPrivacyBehavior(for complication: CLKComplication,
@@ -71,8 +71,10 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     func getCurrentTimelineEntry(for complication: CLKComplication,
                                  withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
+        let apiKey = Bundle.main.object(forInfoDictionaryKey: "TflApiKey")
+        let url = URL(string: String(format: Self.urlString, apiKey as! String))
         sessionCancellable = URLSession.shared
-            .dataTaskPublisher(for: URL(string: Self.urlString)!)
+            .dataTaskPublisher(for: url!)
             .map { $0.data }
             .decode(type: [Line].self, decoder: JSONDecoder())
             .receive(on: DispatchQueue.main)
@@ -141,7 +143,7 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     }
     
     private func multipleLineComplicationDescriptor() -> CLKComplicationDescriptor {
-        return CLKComplicationDescriptor(identifier: ComplicationIdentifier.multipleLineComplication.rawValue,
+        return CLKComplicationDescriptor(identifier: ComplicationIdentifier.multipleLine.rawValue,
                                          displayName: "All Selected Lines",
                                          supportedFamilies: [
                                             .graphicBezel,
@@ -156,13 +158,13 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
                               allLines: [Line],
                               selectedLines: [Line]) -> [Line] {
         switch ComplicationIdentifier(rawValue: complication.identifierPrefix) {
-        case .onlyLineComplication:
+        case .onlyLine:
             return [selectedLines.first].compactMap { $0 }
-        case .singleLineComplication:
+        case .singleLine:
             let lineId = complication.userInfo?["lineId"] as? String
             let line = allLines.first { $0.id == lineId }
             return [line].compactMap { $0 }
-        case .multipleLineComplication:
+        case .multipleLine:
             return selectedLines
         case .none:
             fatalError("Unrecognized complication")
@@ -171,13 +173,13 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     private func sampleLines(for complication: CLKComplication) -> [Line]? {
         switch ComplicationIdentifier(rawValue: complication.identifierPrefix) {
-        case .onlyLineComplication, .singleLineComplication:
+        case .onlyLine, .singleLine:
             guard let lineId = complication.userInfo?["lineId"] as? String,
                   let lineName = LineData.lineIdsToNames[lineId] else {
                 return nil
             }
             return [Line(id: lineId, name: lineName, lineStatuses: [.sampleGoodService])]
-        case .multipleLineComplication:
+        case .multipleLine:
             return .samples
         case .none:
             return nil
