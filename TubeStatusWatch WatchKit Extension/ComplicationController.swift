@@ -255,9 +255,12 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
             guard let lineId = firstLineId,
                   let lineName = firstLineName,
                   let statusSeverityDescription = firstLineMostSevereStatusSeverityDescription else { return nil }
+            let backgroundColor = Color(lineId)
+            let borderColor = backgroundColor == Color("northern") ? Color(.darkGray) : nil
             let contentView = RectangularFullComplicationContentView(title: lineName,
                                                                      subtitle: statusSeverityDescription,
-                                                                     color: Color(lineId))
+                                                                     backgroundColor: backgroundColor,
+                                                                     borderColor: borderColor)
             return CLKComplicationTemplateGraphicRectangularFullView(contentView)
         case .graphicExtraLarge:
             let sliceViewModels = self.sliceViewModels(for: lines)

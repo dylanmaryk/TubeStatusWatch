@@ -9,6 +9,8 @@ import ClockKit
 import SwiftUI
 
 struct LineSettingButton: View {
+    private static let cornerRadius: CGFloat = 9
+    
     @ObservedObject var lineSetting: LineSetting
     @Binding var selectedLineIds: [String]
     
@@ -25,8 +27,18 @@ struct LineSettingButton: View {
                 lineSetting.isSelected ? Image(systemName: "checkmark") : nil
             }
         }
-        .listRowBackground(Color(lineSetting.id)
-                            .cornerRadius(9))
+        .listRowBackground(
+            ZStack {
+                let backgroundColor = Color(lineSetting.id)
+                let borderColor = backgroundColor == Color("northern") ? Color(.darkGray) : nil
+                RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous)
+                    .fill(backgroundColor)
+                if let borderColor = borderColor {
+                    RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous)
+                        .stroke(borderColor)
+                }
+            }
+        )
     }
 }
 

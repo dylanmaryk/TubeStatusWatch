@@ -114,21 +114,28 @@ struct CircularComplicationContentView: View {
 }
 
 struct RectangularFullComplicationContentView: View {
+    private static let cornerRadius: CGFloat = 25
+    
     let title: String
     let subtitle: String
-    let color: Color
+    let backgroundColor: Color
+    let borderColor: Color?
     
     var body: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 25, style: .continuous)
-                .fill(color)
-                .transition(.slide)
+            RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous)
+                .fill(backgroundColor)
+            if let borderColor = borderColor {
+                RoundedRectangle(cornerRadius: Self.cornerRadius, style: .continuous)
+                    .stroke(borderColor)
+            }
             VStack {
                 Text(title)
                     .font(.headline)
                 Text(subtitle)
                     .font(.subheadline)
             }
+            .padding(.init(top: 0, leading: Self.cornerRadius / 2, bottom: 0, trailing: Self.cornerRadius / 2))
         }
     }
 }
@@ -149,7 +156,8 @@ struct ContentView_Previews: PreviewProvider {
                                                                                          thirdSliceViewModel])
         let rectangularFullContentView = RectangularFullComplicationContentView(title: "Bakerloo",
                                                                                 subtitle: "Good Service",
-                                                                                color: Color("bakerloo"))
+                                                                                backgroundColor: Color("bakerloo"),
+                                                                                borderColor: nil)
         
         Group {
             CLKComplicationTemplateGraphicExtraLargeCircularView(circularOneLineContentView)
