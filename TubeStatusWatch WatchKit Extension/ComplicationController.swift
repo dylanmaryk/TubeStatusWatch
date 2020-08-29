@@ -16,12 +16,8 @@ enum ComplicationIdentifier: String {
 }
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
-    private static let urlString = "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status?app_key=%@"
-    
+    @AppStorage("lineUpdates") private var lineUpdatesData: Data?
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
-    @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
-    
-    private var sessionCancellable: AnyCancellable?
     
     // MARK: - Complication Configuration
     
@@ -71,34 +67,15 @@ class ComplicationController: NSObject, CLKComplicationDataSource {
     
     func getCurrentTimelineEntry(for complication: CLKComplication,
                                  withHandler handler: @escaping (CLKComplicationTimelineEntry?) -> Void) {
-        let apiKey = Bundle.main.object(forInfoDictionaryKey: "TflApiKey")
-        let url = URL(string: String(format: Self.urlString, apiKey as! String))
-        sessionCancellable = URLSession.shared
-            .dataTaskPublisher(for: url!)
-            .map { $0.data }
-            .decode(type: [Line].self, decoder: JSONDecoder())
-            .receive(on: DispatchQueue.main)
-            .sink { completion in
-                switch completion {
-                case .finished:
-                    break
-                case .failure:
-                    handler(nil)
-                }
-            } receiveValue: { lines in
-                let selectedLineIds = self.selectedLineIdsString.componentsOrEmpty(separatedBy: ",")
-                let selectedLines = lines.filter { selectedLineIds.contains($0.id) }
-                self.selectedLineUpdatesData = try? JSONEncoder().encode(selectedLines)
-                let visibleLines = self.visibleLines(for: complication,
-                                                     allLines: lines,
-                                                     selectedLines: selectedLines)
-                if let complicationTemplate = self.complicationTemplate(for: complication.family,
-                                                                        and: visibleLines) {
-                    handler(CLKComplicationTimelineEntry(date: Date(), complicationTemplate: complicationTemplate))
-                } else {
-                    handler(nil)
-                }
-            }
+        let lines = lineUpdatesData?.decoded(to: [Line].self) ?? []
+        let selectedLineIds = selectedLineIdsString.componentsOrEmpty(separatedBy: ",")
+        let selectedLines = lines.filter { selectedLineIds.contains($0.id) }
+        let visibleLines = self.visibleLines(for: complication, allLines: lines, selectedLines: selectedLines)
+        if let complicationTemplate = complicationTemplate(for: complication.family, and: visibleLines) {
+            handler(CLKComplicationTimelineEntry(date: Date(), complicationTemplate: complicationTemplate))
+        } else {
+            handler(nil)
+        }
     }
     
     func getTimelineEntries(for complication: CLKComplication,

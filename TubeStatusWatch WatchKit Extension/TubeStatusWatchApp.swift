@@ -6,6 +6,7 @@
 //
 
 import ClockKit
+import Combine
 import SwiftUI
 
 struct LineSettingButton: View {
@@ -112,8 +113,13 @@ struct LineUpdateList: View {
 struct TubeStatusWatchApp: App {
     @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
-    @AppStorage("selectedLineUpdates") private var selectedLineUpdatesData: Data?
+    @AppStorage("lineUpdates") private var lineUpdatesData: Data?
     @State private var isSheetPresented = false
+    
+    init() {
+        _isSheetPresented = State(initialValue: lineUpdatesData?.decoded(to: [Line].self) != nil
+                                    && !selectedLineIdsString.isEmpty)
+    }
     
     var body: some Scene {
         let selectedLineIds = Binding(
@@ -128,26 +134,90 @@ struct TubeStatusWatchApp: App {
         
         WindowGroup {
             LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds)
-                .onAppear {
-                    isSheetPresented = !(selectedLineUpdatesData?.decoded(to: [Line].self)?.isEmpty ?? true)
+                .onChange(of: lineUpdatesData) { data in
+                    isSheetPresented = data?.decoded(to: [Line].self) != nil
+                        && !selectedLineIds.wrappedValue.isEmpty
                 }
-                .onChange(of: selectedLineUpdatesData) { data in
-                    isSheetPresented = !(data?.decoded(to: [Line].self)?.isEmpty ?? true)
-                }
-                .sheet(isPresented: $isSheetPresented, onDismiss: { selectedLineUpdatesData = nil }) {
-                    if let lines = selectedLineUpdatesData?.decoded(to: [Line].self) {
-                        LineUpdateList(lines: lines)
+                .sheet(isPresented: $isSheetPresented) {
+                    let lines = lineUpdatesData?.decoded(to: [Line].self)
+                    let selectedLines = lines?.filter { selectedLineIds.wrappedValue.contains($0.id) }
+                    if let selectedLines = selectedLines, !selectedLines.isEmpty {
+                        LineUpdateList(lines: selectedLines)
                     }
                 }
         }
     }
 }
 
-class ExtensionDelegate: NSObject, WKExtensionDelegate {
+class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelegate {
+    private static let backgroundRefreshIntervalInMinutes = 15.0
+    private static let urlString = "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status?app_key=%@"
+    
+    private var sessionCancellable: AnyCancellable?
+    private var pendingBackgroundTasks: [WKURLSessionRefreshBackgroundTask] = []
+    
+    private var url: URL? {
+        let apiKey = Bundle.main.object(forInfoDictionaryKey: "TflApiKey")
+        return URL(string: String(format: Self.urlString, apiKey as! String))
+    }
+    
+    @AppStorage("lineUpdates") private var lineUpdatesData: Data?
+    
+    func applicationDidFinishLaunching() {
+        scheduleBackgroundRefresh()
+    }
+    
+    func applicationWillEnterForeground() {
+        sessionCancellable = URLSession.shared
+            .dataTaskPublisher(for: url!)
+            .map { $0.data }
+            .receive(on: DispatchQueue.main)
+            .sink { _ in } receiveValue: { self.lineUpdatesData = $0 }
+    }
+    
     func applicationDidEnterBackground() {
         let complicationServer = CLKComplicationServer.sharedInstance()
         complicationServer.activeComplications?.forEach(complicationServer.reloadTimeline)
         complicationServer.reloadComplicationDescriptors()
+    }
+    
+    func handle(_ backgroundTasks: Set<WKRefreshBackgroundTask>) {
+        for task in backgroundTasks {
+            switch task {
+            case let appTask as WKApplicationRefreshBackgroundTask:
+                let configuration = URLSessionConfiguration
+                    .background(withIdentifier: "io.dylanmaryk.TubeStatusWatch.task")
+                let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+                let downloadTask = session.downloadTask(with: url!)
+                downloadTask.resume()
+                scheduleBackgroundRefresh()
+                appTask.setTaskCompletedWithSnapshot(false)
+            case let urlSessionTask as WKURLSessionRefreshBackgroundTask:
+                let configuration = URLSessionConfiguration
+                    .background(withIdentifier: urlSessionTask.sessionIdentifier)
+                _ = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+                pendingBackgroundTasks.append(urlSessionTask)
+            default:
+                task.setTaskCompletedWithSnapshot(false)
+            }
+        }
+    }
+    
+    func urlSession(_ session: URLSession,
+                    downloadTask: URLSessionDownloadTask,
+                    didFinishDownloadingTo location: URL) {
+        lineUpdatesData = try? Data(contentsOf: location)
+        let complicationServer = CLKComplicationServer.sharedInstance()
+        complicationServer.activeComplications?.forEach(complicationServer.reloadTimeline)
+        pendingBackgroundTasks.forEach { $0.setTaskCompletedWithSnapshot(false) }
+    }
+    
+    private func scheduleBackgroundRefresh() {
+        WKExtension.shared()
+            .scheduleBackgroundRefresh(withPreferredDate: Date()
+                                        .addingTimeInterval(Self.backgroundRefreshIntervalInMinutes * 60),
+                                       userInfo: nil,
+                                       scheduledCompletion: { _ in })
     }
 }
 
