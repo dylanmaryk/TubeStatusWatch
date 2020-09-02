@@ -8,6 +8,8 @@
 import ClockKit
 import Combine
 import SwiftUI
+import SwiftyStoreKit
+import TPInAppReceipt // delete?
 
 struct LineSettingButton: View {
     private static let cornerRadius: CGFloat = 9
@@ -46,9 +48,70 @@ struct LineSettingButton: View {
 struct LineSettingList: View {
     let lineSettings: [LineSetting]
     @Binding var selectedLineIds: [String]
+    @Binding var isUpgraded: Bool
+    
+    @State private var localizedTitle = ""
+    @State private var localizedDescription = ""
+    @State private var localizedPrice: String?
+    @State private var upgradeError = ""
+    @State private var restoreError = ""
+    @State private var isSheetPresented = false
+    @State private var isUpgradeErrorAlertPresented = false
+    @State private var isRestoreErrorAlertPresented = false
     
     var body: some View {
         List {
+            if !isUpgraded {
+                Button {
+                    SwiftyStoreKit.retrieveProductsInfo(["io.dylanmaryk.TubeStatusWatch.upgrade"]) { results in
+                        guard let product = results.retrievedProducts.first else {
+                            return
+                        }
+                        localizedTitle = product.localizedTitle
+                        localizedDescription = product.localizedDescription
+                        localizedPrice = product.localizedPrice
+                        isSheetPresented = true
+                    }
+                } label: {
+                    Text("UPGRADE")
+                }
+                .sheet(isPresented: $isSheetPresented) {
+                    Text(localizedTitle)
+                    Text(localizedDescription)
+                    Text(localizedPrice!)
+                    Button("UPGRADE") {
+                        SwiftyStoreKit.purchaseProduct("io.dylanmaryk.TubeStatusWatch.upgrade") { result in
+                            switch result {
+                            case .success:
+                                isSheetPresented = false
+//                                isUpgraded = true
+                            case .error(let error):
+                                isUpgradeErrorAlertPresented = true
+                                upgradeError = (error as NSError).localizedDescription
+                            }
+                        }
+                    }
+                    .alert(isPresented: $isUpgradeErrorAlertPresented) {
+                        Alert(title: Text(upgradeError))
+                    }
+                    Button("Restore Purchases") {
+                        SwiftyStoreKit.fetchReceipt(forceRefresh: false) { result in
+                            switch result {
+                            case .success(let receiptData):
+                                let receipt = try? InAppReceipt(receiptData: receiptData) // delete?
+//                                isUpgraded = true
+                                print("Restored purchases")
+                            case .error(let error):
+                                isRestoreErrorAlertPresented = true
+                                restoreError = (error as NSError).localizedDescription
+                            }
+                        }
+                    }
+                    .alert(isPresented: $isRestoreErrorAlertPresented) {
+                        Alert(title: Text(restoreError))
+                    }
+                }
+            }
             ForEach(lineSettings) { lineSetting in
                 LineSettingButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
             }
@@ -114,6 +177,7 @@ struct TubeStatusWatchApp: App {
     @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
     @AppStorage("lineUpdates") private var lineUpdatesData: Data?
+    @AppStorage("isUpgraded") private var isUpgraded = false
     @State private var isSheetPresented = false
     
     init() {
@@ -133,7 +197,8 @@ struct TubeStatusWatchApp: App {
         }
         
         WindowGroup {
-            LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds)
+            LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds, isUpgraded: $isUpgraded)
+                // Maybe remove onChange? Can make sheet appear again if new data retrieved after already dismissed.
                 .onChange(of: lineUpdatesData) { data in
                     isSheetPresented = data?.decoded(to: [Line].self) != nil
                         && !selectedLineIds.wrappedValue.isEmpty
@@ -162,9 +227,11 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     }
     
     @AppStorage("lineUpdates") private var lineUpdatesData: Data?
+    @AppStorage("isUpgraded") private var isUpgraded = false
     
     func applicationDidFinishLaunching() {
         scheduleBackgroundRefresh()
+        completeTransactions()
     }
     
     func applicationWillEnterForeground() {
@@ -219,6 +286,24 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
                                        userInfo: nil,
                                        scheduledCompletion: { _ in })
     }
+    
+    private func completeTransactions() {
+        SwiftyStoreKit.completeTransactions { purchases in
+            for purchase in purchases {
+                switch purchase.transaction.transactionState {
+                case .purchased, .restored:
+                    if purchase.needsFinishTransaction {
+                        SwiftyStoreKit.finishTransaction(purchase.transaction)
+                    }
+                    self.isUpgraded = true
+                case .purchasing, .failed, .deferred:
+                    break
+                @unknown default:
+                    break
+                }
+            }
+        }
+    }
 }
 
 struct TubeStatusWatchApp_Previews: PreviewProvider {
@@ -226,13 +311,19 @@ struct TubeStatusWatchApp_Previews: PreviewProvider {
         let lineSettings = [LineSetting(id: "bakerloo", name: "Bakerloo", isSelected: true),
                             LineSetting(id: "central", name: "Central", isSelected: false),
                             LineSetting(id: "circle", name: "Circle", isSelected: false)]
-        let selectedLineSettingIds = Binding(
+        let selectedLineIds = Binding(
             get: { ["bakerloo"] },
+            set: { _ in }
+        )
+        let isUpgraded = Binding(
+            get: { false },
             set: { _ in }
         )
         
         Group {
-            LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineSettingIds)
+            LineSettingList(lineSettings: lineSettings,
+                            selectedLineIds: selectedLineIds,
+                            isUpgraded: isUpgraded)
             LineUpdateList(lines: .samples)
         }
     }

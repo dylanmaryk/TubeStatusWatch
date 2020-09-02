@@ -3,10 +3,11 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		353D28C324FC2B4700AA0EA8 /* TPInAppReceipt in Frameworks */ = {isa = PBXBuildFile; productRef = 353D28C224FC2B4700AA0EA8 /* TPInAppReceipt */; };
 		354C70B524E813AF00681798 /* StatusSeverityMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354C70B424E813AF00681798 /* StatusSeverityMapper.swift */; };
 		354C70B724E824B800681798 /* LineData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354C70B624E824B800681798 /* LineData.swift */; };
 		354C70B924E84FAC00681798 /* String+ComponentsOrEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354C70B824E84FAC00681798 /* String+ComponentsOrEmpty.swift */; };
@@ -21,6 +22,8 @@
 		356663FF24A7C9530007DA72 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356663FE24A7C9530007DA72 /* ComplicationController.swift */; };
 		3566640124A7C9540007DA72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3566640024A7C9540007DA72 /* Assets.xcassets */; };
 		3566640424A7C9540007DA72 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3566640324A7C9540007DA72 /* Preview Assets.xcassets */; };
+		358C9FDD24FAC2AD00EF6D8F /* Configuration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */; };
+		358C9FE024FAE2A600EF6D8F /* SwiftyStoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = 358C9FDF24FAE2A600EF6D8F /* SwiftyStoreKit */; };
 		35C0D04A24E9769C00A7539A /* Complication+IdentifierPrefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C0D04924E9769C00A7539A /* Complication+IdentifierPrefix.swift */; };
 		35C86F3B24ED959500EF4EF1 /* Data+Decoded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C86F3A24ED959500EF4EF1 /* Data+Decoded.swift */; };
 /* End PBXBuildFile section */
@@ -85,6 +88,7 @@
 		3566640024A7C9540007DA72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3566640324A7C9540007DA72 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3566640524A7C9540007DA72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
 		35B98AF524F4528700B138E8 /* Keys.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Keys.xcconfig; sourceTree = "<group>"; };
 		35C0D04924E9769C00A7539A /* Complication+IdentifierPrefix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Complication+IdentifierPrefix.swift"; sourceTree = "<group>"; };
 		35C86F3A24ED959500EF4EF1 /* Data+Decoded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Decoded.swift"; sourceTree = "<group>"; };
@@ -95,6 +99,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				353D28C324FC2B4700AA0EA8 /* TPInAppReceipt in Frameworks */,
+				358C9FE024FAE2A600EF6D8F /* SwiftyStoreKit in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -159,6 +165,7 @@
 				3556362424F292DC00D6EF79 /* Models */,
 				3566640024A7C9540007DA72 /* Assets.xcassets */,
 				3566640524A7C9540007DA72 /* Info.plist */,
+				358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */,
 				35B98AF524F4528700B138E8 /* Keys.xcconfig */,
 				3566640224A7C9540007DA72 /* Preview Content */,
 			);
@@ -233,6 +240,10 @@
 			dependencies = (
 			);
 			name = "TubeStatusWatch WatchKit Extension";
+			packageProductDependencies = (
+				358C9FDF24FAE2A600EF6D8F /* SwiftyStoreKit */,
+				353D28C224FC2B4700AA0EA8 /* TPInAppReceipt */,
+			);
 			productName = "TubeStatusWatch WatchKit Extension";
 			productReference = 356663F524A7C9530007DA72 /* TubeStatusWatch WatchKit Extension.appex */;
 			productType = "com.apple.product-type.watchkit2-extension";
@@ -266,6 +277,10 @@
 				Base,
 			);
 			mainGroup = 356663DE24A7C9510007DA72;
+			packageReferences = (
+				358C9FDE24FAE2A600EF6D8F /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */,
+				353D28C124FC2B4700AA0EA8 /* XCRemoteSwiftPackageReference "TPInAppReceipt" */,
+			);
 			productRefGroup = 356663E624A7C9510007DA72 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -298,6 +313,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				3566640424A7C9540007DA72 /* Preview Assets.xcassets in Resources */,
+				358C9FDD24FAC2AD00EF6D8F /* Configuration.storekit in Resources */,
 				3566640124A7C9540007DA72 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -611,6 +627,38 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		353D28C124FC2B4700AA0EA8 /* XCRemoteSwiftPackageReference "TPInAppReceipt" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/tikhop/TPInAppReceipt.git";
+			requirement = {
+				branch = develop;
+				kind = branch;
+			};
+		};
+		358C9FDE24FAE2A600EF6D8F /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/bizz84/SwiftyStoreKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.16.1;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		353D28C224FC2B4700AA0EA8 /* TPInAppReceipt */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 353D28C124FC2B4700AA0EA8 /* XCRemoteSwiftPackageReference "TPInAppReceipt" */;
+			productName = TPInAppReceipt;
+		};
+		358C9FDF24FAE2A600EF6D8F /* SwiftyStoreKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 358C9FDE24FAE2A600EF6D8F /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */;
+			productName = SwiftyStoreKit;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 356663DF24A7C9510007DA72 /* Project object */;
 }
