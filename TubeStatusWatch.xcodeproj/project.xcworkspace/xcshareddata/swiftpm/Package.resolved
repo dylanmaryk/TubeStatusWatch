@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "Purchases",
+        "repositoryURL": "https://github.com/RevenueCat/purchases-ios.git",
+        "state": {
+          "branch": null,
+          "revision": "1d8c19602a0e4818254a4805d324515bde293167",
+          "version": "3.5.3"
+        }
+      },
+      {
         "package": "SwiftyStoreKit",
         "repositoryURL": "https://github.com/bizz84/SwiftyStoreKit.git",
         "state": {

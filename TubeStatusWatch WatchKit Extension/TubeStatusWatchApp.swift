@@ -7,9 +7,12 @@
 
 import ClockKit
 import Combine
+import Purchases
 import SwiftUI
 import SwiftyStoreKit
 import TPInAppReceipt // delete?
+
+typealias Package = Purchases.Package
 
 struct LineSettingButton: View {
     private static let cornerRadius: CGFloat = 9
@@ -50,65 +53,47 @@ struct LineSettingList: View {
     @Binding var selectedLineIds: [String]
     @Binding var isUpgraded: Bool
     
-    @State private var localizedTitle = ""
-    @State private var localizedDescription = ""
+    @State private var package: Package?
+    @State private var localizedDescription: String?
     @State private var localizedPrice: String?
-    @State private var upgradeError = ""
-    @State private var restoreError = ""
     @State private var isSheetPresented = false
-    @State private var isUpgradeErrorAlertPresented = false
-    @State private var isRestoreErrorAlertPresented = false
     
     var body: some View {
         List {
             if !isUpgraded {
-                Button {
-                    SwiftyStoreKit.retrieveProductsInfo(["io.dylanmaryk.TubeStatusWatch.upgrade"]) { results in
-                        guard let product = results.retrievedProducts.first else {
+                Button("UPGRADE") {
+                    Purchases.shared.offerings { offerings, _ in
+                        guard let currentOffering = offerings?.current,
+                              let firstPackage = currentOffering.availablePackages.first else {
                             return
                         }
-                        localizedTitle = product.localizedTitle
-                        localizedDescription = product.localizedDescription
-                        localizedPrice = product.localizedPrice
+                        package = firstPackage
+                        localizedDescription = currentOffering.serverDescription
+                        localizedPrice = firstPackage.localizedPriceString
                         isSheetPresented = true
                     }
-                } label: {
-                    Text("UPGRADE")
                 }
                 .sheet(isPresented: $isSheetPresented) {
-                    Text(localizedTitle)
-                    Text(localizedDescription)
+                    Text(localizedDescription!)
                     Text(localizedPrice!)
                     Button("UPGRADE") {
-                        SwiftyStoreKit.purchaseProduct("io.dylanmaryk.TubeStatusWatch.upgrade") { result in
-                            switch result {
-                            case .success:
+                        guard let package = package else {
+                            return
+                        }
+                        Purchases.shared.purchasePackage(package) { _, purchaserInfo, _, _ in
+                            if purchaserInfo?.entitlements.all["pro"]?.isActive == true {
                                 isSheetPresented = false
-//                                isUpgraded = true
-                            case .error(let error):
-                                isUpgradeErrorAlertPresented = true
-                                upgradeError = (error as NSError).localizedDescription
+                                isUpgraded = true
                             }
                         }
-                    }
-                    .alert(isPresented: $isUpgradeErrorAlertPresented) {
-                        Alert(title: Text(upgradeError))
                     }
                     Button("Restore Purchases") {
-                        SwiftyStoreKit.fetchReceipt(forceRefresh: false) { result in
-                            switch result {
-                            case .success(let receiptData):
-                                let receipt = try? InAppReceipt(receiptData: receiptData) // delete?
-//                                isUpgraded = true
-                                print("Restored purchases")
-                            case .error(let error):
-                                isRestoreErrorAlertPresented = true
-                                restoreError = (error as NSError).localizedDescription
+                        Purchases.shared.restoreTransactions { purchaserInfo, _ in
+                            if purchaserInfo?.entitlements.all["pro"]?.isActive == true {
+                                isSheetPresented = false
+                                isUpgraded = true
                             }
                         }
-                    }
-                    .alert(isPresented: $isRestoreErrorAlertPresented) {
-                        Alert(title: Text(restoreError))
                     }
                 }
             }
@@ -231,7 +216,8 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     
     func applicationDidFinishLaunching() {
         scheduleBackgroundRefresh()
-        completeTransactions()
+        Purchases.debugLogsEnabled = true
+        Purchases.configure(withAPIKey: "iZVFjadDximLFdOcVsNZqtCpipfRvApB")
     }
     
     func applicationWillEnterForeground() {
@@ -285,24 +271,6 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
                                         .addingTimeInterval(Self.backgroundRefreshIntervalInMinutes * 60),
                                        userInfo: nil,
                                        scheduledCompletion: { _ in })
-    }
-    
-    private func completeTransactions() {
-        SwiftyStoreKit.completeTransactions { purchases in
-            for purchase in purchases {
-                switch purchase.transaction.transactionState {
-                case .purchased, .restored:
-                    if purchase.needsFinishTransaction {
-                        SwiftyStoreKit.finishTransaction(purchase.transaction)
-                    }
-                    self.isUpgraded = true
-                case .purchasing, .failed, .deferred:
-                    break
-                @unknown default:
-                    break
-                }
-            }
-        }
     }
 }
 
