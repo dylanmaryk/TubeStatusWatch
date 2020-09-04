@@ -9,8 +9,6 @@ import ClockKit
 import Combine
 import Purchases
 import SwiftUI
-import SwiftyStoreKit
-import TPInAppReceipt // delete?
 
 typealias Package = Purchases.Package
 

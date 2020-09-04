@@ -2,39 +2,12 @@
   "object": {
     "pins": [
       {
-        "package": "ASN1Swift",
-        "repositoryURL": "https://github.com/tikhop/ASN1Swift",
-        "state": {
-          "branch": "master",
-          "revision": "8100641d7b4b64f04a440b1e86d75dd315ca59fb",
-          "version": null
-        }
-      },
-      {
         "package": "Purchases",
         "repositoryURL": "https://github.com/RevenueCat/purchases-ios.git",
         "state": {
           "branch": null,
           "revision": "1d8c19602a0e4818254a4805d324515bde293167",
           "version": "3.5.3"
-        }
-      },
-      {
-        "package": "SwiftyStoreKit",
-        "repositoryURL": "https://github.com/bizz84/SwiftyStoreKit.git",
-        "state": {
-          "branch": null,
-          "revision": "9974acf07b31b6f5bf363d5118dc1bd4fcac6122",
-          "version": "0.16.1"
-        }
-      },
-      {
-        "package": "TPInAppReceipt",
-        "repositoryURL": "https://github.com/tikhop/TPInAppReceipt.git",
-        "state": {
-          "branch": "develop",
-          "revision": "f61bf8b2cbbdb689c03c0228b907cec27fc2b36f",
-          "version": null
         }
       }
     ]

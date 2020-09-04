@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		353D28C324FC2B4700AA0EA8 /* TPInAppReceipt in Frameworks */ = {isa = PBXBuildFile; productRef = 353D28C224FC2B4700AA0EA8 /* TPInAppReceipt */; };
 		354C70B524E813AF00681798 /* StatusSeverityMapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354C70B424E813AF00681798 /* StatusSeverityMapper.swift */; };
 		354C70B724E824B800681798 /* LineData.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354C70B624E824B800681798 /* LineData.swift */; };
 		354C70B924E84FAC00681798 /* String+ComponentsOrEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354C70B824E84FAC00681798 /* String+ComponentsOrEmpty.swift */; };
@@ -24,7 +23,6 @@
 		3566640424A7C9540007DA72 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3566640324A7C9540007DA72 /* Preview Assets.xcassets */; };
 		357AF9FE25017C0F003B51A9 /* Purchases in Frameworks */ = {isa = PBXBuildFile; productRef = 357AF9FD25017C0F003B51A9 /* Purchases */; };
 		358C9FDD24FAC2AD00EF6D8F /* Configuration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */; };
-		358C9FE024FAE2A600EF6D8F /* SwiftyStoreKit in Frameworks */ = {isa = PBXBuildFile; productRef = 358C9FDF24FAE2A600EF6D8F /* SwiftyStoreKit */; };
 		35C0D04A24E9769C00A7539A /* Complication+IdentifierPrefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C0D04924E9769C00A7539A /* Complication+IdentifierPrefix.swift */; };
 		35C86F3B24ED959500EF4EF1 /* Data+Decoded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C86F3A24ED959500EF4EF1 /* Data+Decoded.swift */; };
 /* End PBXBuildFile section */
@@ -100,8 +98,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				353D28C324FC2B4700AA0EA8 /* TPInAppReceipt in Frameworks */,
-				358C9FE024FAE2A600EF6D8F /* SwiftyStoreKit in Frameworks */,
 				357AF9FE25017C0F003B51A9 /* Purchases in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -243,8 +239,6 @@
 			);
 			name = "TubeStatusWatch WatchKit Extension";
 			packageProductDependencies = (
-				358C9FDF24FAE2A600EF6D8F /* SwiftyStoreKit */,
-				353D28C224FC2B4700AA0EA8 /* TPInAppReceipt */,
 				357AF9FD25017C0F003B51A9 /* Purchases */,
 			);
 			productName = "TubeStatusWatch WatchKit Extension";
@@ -281,8 +275,6 @@
 			);
 			mainGroup = 356663DE24A7C9510007DA72;
 			packageReferences = (
-				358C9FDE24FAE2A600EF6D8F /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */,
-				353D28C124FC2B4700AA0EA8 /* XCRemoteSwiftPackageReference "TPInAppReceipt" */,
 				357AF9FC25017C0F003B51A9 /* XCRemoteSwiftPackageReference "purchases-ios" */,
 			);
 			productRefGroup = 356663E624A7C9510007DA72 /* Products */;
@@ -633,14 +625,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		353D28C124FC2B4700AA0EA8 /* XCRemoteSwiftPackageReference "TPInAppReceipt" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/tikhop/TPInAppReceipt.git";
-			requirement = {
-				branch = develop;
-				kind = branch;
-			};
-		};
 		357AF9FC25017C0F003B51A9 /* XCRemoteSwiftPackageReference "purchases-ios" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/RevenueCat/purchases-ios.git";
@@ -649,31 +633,13 @@
 				minimumVersion = 3.5.3;
 			};
 		};
-		358C9FDE24FAE2A600EF6D8F /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/bizz84/SwiftyStoreKit.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 0.16.1;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		353D28C224FC2B4700AA0EA8 /* TPInAppReceipt */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 353D28C124FC2B4700AA0EA8 /* XCRemoteSwiftPackageReference "TPInAppReceipt" */;
-			productName = TPInAppReceipt;
-		};
 		357AF9FD25017C0F003B51A9 /* Purchases */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = 357AF9FC25017C0F003B51A9 /* XCRemoteSwiftPackageReference "purchases-ios" */;
 			productName = Purchases;
-		};
-		358C9FDF24FAE2A600EF6D8F /* SwiftyStoreKit */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = 358C9FDE24FAE2A600EF6D8F /* XCRemoteSwiftPackageReference "SwiftyStoreKit" */;
-			productName = SwiftyStoreKit;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
