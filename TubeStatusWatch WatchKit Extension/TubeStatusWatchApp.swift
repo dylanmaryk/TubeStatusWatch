@@ -17,13 +17,18 @@ struct LineSettingButton: View {
     
     @ObservedObject var lineSetting: LineSetting
     @Binding var selectedLineIds: [String]
+    let canSelectMultipleLines: Bool
     
     var body: some View {
         Button {
             lineSetting.isSelected.toggle()
-            lineSetting.isSelected
-                ? selectedLineIds.append(lineSetting.id)
-                : selectedLineIds.removeAll { $0 == lineSetting.id }
+            if lineSetting.isSelected, canSelectMultipleLines {
+                selectedLineIds.append(lineSetting.id)
+            } else if lineSetting.isSelected {
+                selectedLineIds = [lineSetting.id]
+            } else {
+                selectedLineIds.removeAll { $0 == lineSetting.id }
+            }
         } label: {
             HStack {
                 Text(lineSetting.name)
@@ -96,7 +101,9 @@ struct LineSettingList: View {
                 }
             }
             ForEach(lineSettings) { lineSetting in
-                LineSettingButton(lineSetting: lineSetting, selectedLineIds: $selectedLineIds)
+                LineSettingButton(lineSetting: lineSetting,
+                                  selectedLineIds: $selectedLineIds,
+                                  canSelectMultipleLines: isUpgraded)
             }
         }
     }
