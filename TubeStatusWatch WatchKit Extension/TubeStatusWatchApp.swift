@@ -10,7 +10,70 @@ import Combine
 import Purchases
 import SwiftUI
 
+// MARK: - Upgrade
+
 typealias Package = Purchases.Package
+typealias PurchaserInfo = Purchases.PurchaserInfo
+
+struct UpgradeSheet: View {
+    let upgradeSheetViewModel: UpgradeSheetViewModel
+    @Binding var isSheetPresented: Bool
+    @Binding var isUpgraded: Bool
+    
+    var body: some View {
+        ScrollView {
+            Text("Upgrade")
+                .bold()
+            Text(upgradeSheetViewModel.localizedDescription.replacingOccurrences(of: "\\n", with: "\n"))
+            Button("\(upgradeSheetViewModel.localizedPrice) One-time") {
+                Purchases.shared.purchasePackage(upgradeSheetViewModel.package) { _, purchaserInfo, _, _ in
+                    enableUpgrade(basedOn: purchaserInfo)
+                }
+            }
+            Button("Restore Purchases") {
+                Purchases.shared.restoreTransactions { purchaserInfo, _ in
+                    enableUpgrade(basedOn: purchaserInfo)
+                }
+            }
+        }
+    }
+    
+    private func enableUpgrade(basedOn purchaserInfo: PurchaserInfo?) {
+        if purchaserInfo?.entitlements.all["pro"]?.isActive == true {
+            isSheetPresented = false
+            isUpgraded = true
+        }
+    }
+}
+
+struct UpgradeButton: View {
+    @Binding var isUpgraded: Bool
+    
+    @StateObject private var upgradeSheetViewModel = UpgradeSheetViewModel()
+    @State private var isSheetPresented = false
+    
+    var body: some View {
+        Button("UPGRADE") {
+            Purchases.shared.offerings { offerings, _ in
+                guard let currentOffering = offerings?.current,
+                      let firstPackage = currentOffering.availablePackages.first else {
+                    return
+                }
+                upgradeSheetViewModel.localizedDescription = currentOffering.serverDescription
+                upgradeSheetViewModel.localizedPrice = firstPackage.localizedPriceString
+                upgradeSheetViewModel.package = firstPackage
+                isSheetPresented = true
+            }
+        }
+        .sheet(isPresented: $isSheetPresented) {
+            UpgradeSheet(upgradeSheetViewModel: upgradeSheetViewModel,
+                         isSheetPresented: $isSheetPresented,
+                         isUpgraded: $isUpgraded)
+        }
+    }
+}
+
+// MARK: - Line Settings
 
 struct LineSettingButton: View {
     private static let cornerRadius: CGFloat = 9
@@ -56,49 +119,10 @@ struct LineSettingList: View {
     @Binding var selectedLineIds: [String]
     @Binding var isUpgraded: Bool
     
-    @State private var package: Package?
-    @State private var localizedDescription: String?
-    @State private var localizedPrice: String?
-    @State private var isSheetPresented = false
-    
     var body: some View {
         List {
             if !isUpgraded {
-                Button("UPGRADE") {
-                    Purchases.shared.offerings { offerings, _ in
-                        guard let currentOffering = offerings?.current,
-                              let firstPackage = currentOffering.availablePackages.first else {
-                            return
-                        }
-                        package = firstPackage
-                        localizedDescription = currentOffering.serverDescription
-                        localizedPrice = firstPackage.localizedPriceString
-                        isSheetPresented = true
-                    }
-                }
-                .sheet(isPresented: $isSheetPresented) {
-                    Text(localizedDescription!)
-                    Text(localizedPrice!)
-                    Button("UPGRADE") {
-                        guard let package = package else {
-                            return
-                        }
-                        Purchases.shared.purchasePackage(package) { _, purchaserInfo, _, _ in
-                            if purchaserInfo?.entitlements.all["pro"]?.isActive == true {
-                                isSheetPresented = false
-                                isUpgraded = true
-                            }
-                        }
-                    }
-                    Button("Restore Purchases") {
-                        Purchases.shared.restoreTransactions { purchaserInfo, _ in
-                            if purchaserInfo?.entitlements.all["pro"]?.isActive == true {
-                                isSheetPresented = false
-                                isUpgraded = true
-                            }
-                        }
-                    }
-                }
+                UpgradeButton(isUpgraded: $isUpgraded)
             }
             ForEach(lineSettings) { lineSetting in
                 LineSettingButton(lineSetting: lineSetting,
@@ -108,6 +132,8 @@ struct LineSettingList: View {
         }
     }
 }
+
+// MARK: - Line Updates
 
 struct LineUpdateItemStatusSeverity: View {
     let statusSeverityDescription: String?
@@ -123,7 +149,6 @@ struct LineUpdateItemStatusSeverity: View {
         }
         if let reason = reason {
             Text(reason)
-                .font(.body)
                 .frame(maxWidth: .infinity, alignment: .leading)
         }
     }
@@ -162,6 +187,8 @@ struct LineUpdateList: View {
     }
 }
 
+// MARK: - App
+
 @main
 struct TubeStatusWatchApp: App {
     @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
@@ -190,7 +217,8 @@ struct TubeStatusWatchApp: App {
             LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds, isUpgraded: $isUpgraded)
                 // Maybe remove onChange? Can make sheet appear again if new data retrieved after already dismissed.
                 .onChange(of: lineUpdatesData) { data in
-                    isSheetPresented = data?.decoded(to: [Line].self) != nil
+                    isSheetPresented = isSheetPresented
+                        && data?.decoded(to: [Line].self) != nil
                         && !selectedLineIds.wrappedValue.isEmpty
                 }
                 .sheet(isPresented: $isSheetPresented) {
@@ -207,12 +235,14 @@ struct TubeStatusWatchApp: App {
 class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelegate {
     private static let backgroundRefreshIntervalInMinutes = 15.0
     private static let urlString = "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status?app_key=%@"
+    private static let apiKeyInfoDictionaryKey = "TflApiKey"
+    private static let purchasesApiKey = "iZVFjadDximLFdOcVsNZqtCpipfRvApB"
     
     private var sessionCancellable: AnyCancellable?
     private var pendingBackgroundTasks: [WKURLSessionRefreshBackgroundTask] = []
     
     private var url: URL? {
-        let apiKey = Bundle.main.object(forInfoDictionaryKey: "TflApiKey")
+        let apiKey = Bundle.main.object(forInfoDictionaryKey: Self.apiKeyInfoDictionaryKey)
         return URL(string: String(format: Self.urlString, apiKey as! String))
     }
     
@@ -222,7 +252,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     func applicationDidFinishLaunching() {
         scheduleBackgroundRefresh()
         Purchases.debugLogsEnabled = true
-        Purchases.configure(withAPIKey: "iZVFjadDximLFdOcVsNZqtCpipfRvApB")
+        Purchases.configure(withAPIKey: Self.purchasesApiKey)
     }
     
     func applicationWillEnterForeground() {
@@ -279,24 +309,24 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     }
 }
 
+// MARK: - Previews
+
 struct TubeStatusWatchApp_Previews: PreviewProvider {
     static var previews: some View {
         let lineSettings = [LineSetting(id: "bakerloo", name: "Bakerloo", isSelected: true),
                             LineSetting(id: "central", name: "Central", isSelected: false),
                             LineSetting(id: "circle", name: "Circle", isSelected: false)]
-        let selectedLineIds = Binding(
-            get: { ["bakerloo"] },
-            set: { _ in }
-        )
-        let isUpgraded = Binding(
-            get: { false },
-            set: { _ in }
-        )
+        let upgradeSheetViewModel = UpgradeSheetViewModel(localizedDescription: "The standard set of packages",
+                                                          localizedPrice: "£0.99",
+                                                          package: Package())
         
         Group {
             LineSettingList(lineSettings: lineSettings,
-                            selectedLineIds: selectedLineIds,
-                            isUpgraded: isUpgraded)
+                            selectedLineIds: .constant(["bakerloo"]),
+                            isUpgraded: .constant(false))
+            UpgradeSheet(upgradeSheetViewModel: upgradeSheetViewModel,
+                         isSheetPresented: .constant(true),
+                         isUpgraded: .constant(false))
             LineUpdateList(lines: .samples)
         }
     }
