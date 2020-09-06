@@ -21,7 +21,6 @@ struct UpgradeSheet: View {
     @Binding var isUpgraded: Bool
     
     @State private var errorDescription: String?
-    @State private var isLoading = false
     
     var body: some View {
         ZStack {
@@ -30,22 +29,15 @@ struct UpgradeSheet: View {
                     .bold()
                 Text(upgradeSheetViewModel.localizedDescription.replacingOccurrences(of: "\\n", with: "\n"))
                 Button("\(upgradeSheetViewModel.localizedPrice) One-time") {
-                    isLoading = true
                     Purchases.shared.purchasePackage(upgradeSheetViewModel.package) { _, purchaserInfo, error, _ in
-                        isLoading = false
                         enableUpgrade(basedOn: purchaserInfo, and: error)
                     }
                 }
                 Button("Restore Purchases") {
-                    isLoading = true
                     Purchases.shared.restoreTransactions { purchaserInfo, error in
-                        isLoading = false
                         enableUpgrade(basedOn: purchaserInfo, and: error)
                     }
                 }
-            }
-            if isLoading {
-                ProgressView()
             }
         }
         .alert(item: $errorDescription) { errorDescription in
