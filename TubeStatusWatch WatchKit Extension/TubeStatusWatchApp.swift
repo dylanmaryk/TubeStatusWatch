@@ -20,25 +20,44 @@ struct UpgradeSheet: View {
     @Binding var isSheetPresented: Bool
     @Binding var isUpgraded: Bool
     
+    @State private var errorDescription: String?
+    @State private var isLoading = false
+    
     var body: some View {
-        ScrollView {
-            Text("Upgrade")
-                .bold()
-            Text(upgradeSheetViewModel.localizedDescription.replacingOccurrences(of: "\\n", with: "\n"))
-            Button("\(upgradeSheetViewModel.localizedPrice) One-time") {
-                Purchases.shared.purchasePackage(upgradeSheetViewModel.package) { _, purchaserInfo, _, _ in
-                    enableUpgrade(basedOn: purchaserInfo)
+        ZStack {
+            ScrollView {
+                Text("Upgrade")
+                    .bold()
+                Text(upgradeSheetViewModel.localizedDescription.replacingOccurrences(of: "\\n", with: "\n"))
+                Button("\(upgradeSheetViewModel.localizedPrice) One-time") {
+                    isLoading = true
+                    Purchases.shared.purchasePackage(upgradeSheetViewModel.package) { _, purchaserInfo, error, _ in
+                        isLoading = false
+                        enableUpgrade(basedOn: purchaserInfo, and: error)
+                    }
+                }
+                Button("Restore Purchases") {
+                    isLoading = true
+                    Purchases.shared.restoreTransactions { purchaserInfo, error in
+                        isLoading = false
+                        enableUpgrade(basedOn: purchaserInfo, and: error)
+                    }
                 }
             }
-            Button("Restore Purchases") {
-                Purchases.shared.restoreTransactions { purchaserInfo, _ in
-                    enableUpgrade(basedOn: purchaserInfo)
-                }
+            if isLoading {
+                ProgressView()
             }
+        }
+        .alert(item: $errorDescription) { errorDescription in
+            Alert(title: Text(errorDescription))
         }
     }
     
-    private func enableUpgrade(basedOn purchaserInfo: PurchaserInfo?) {
+    private func enableUpgrade(basedOn purchaserInfo: PurchaserInfo?, and error: Error?) {
+        if let error = error {
+            errorDescription = error.localizedDescription
+            return
+        }
         if purchaserInfo?.entitlements.all["pro"]?.isActive == true {
             isSheetPresented = false
             isUpgraded = true
@@ -47,14 +66,24 @@ struct UpgradeSheet: View {
 }
 
 struct UpgradeButton: View {
+    private static let labelPadding: CGFloat = 9
+    
     @Binding var isUpgraded: Bool
+    @Binding var isLoading: Bool
     
     @StateObject private var upgradeSheetViewModel = UpgradeSheetViewModel()
+    @State private var errorDescription: String?
     @State private var isSheetPresented = false
     
     var body: some View {
-        Button("UPGRADE") {
-            Purchases.shared.offerings { offerings, _ in
+        Button {
+            isLoading = true
+            Purchases.shared.offerings { offerings, error in
+                isLoading = false
+                if let error = error {
+                    errorDescription = error.localizedDescription
+                    return
+                }
                 guard let currentOffering = offerings?.current,
                       let firstPackage = currentOffering.availablePackages.first else {
                     return
@@ -64,11 +93,23 @@ struct UpgradeButton: View {
                 upgradeSheetViewModel.package = firstPackage
                 isSheetPresented = true
             }
+        } label: {
+            VStack {
+                Text("UPGRADE")
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                Text("Unlock multiple lines & complications")
+                    .font(.footnote)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(.init(top: Self.labelPadding, leading: 0, bottom: Self.labelPadding, trailing: 0))
         }
         .sheet(isPresented: $isSheetPresented) {
             UpgradeSheet(upgradeSheetViewModel: upgradeSheetViewModel,
                          isSheetPresented: $isSheetPresented,
                          isUpgraded: $isUpgraded)
+        }
+        .alert(item: $errorDescription) { errorDescription in
+            Alert(title: Text(errorDescription))
         }
     }
 }
@@ -119,15 +160,22 @@ struct LineSettingList: View {
     @Binding var selectedLineIds: [String]
     @Binding var isUpgraded: Bool
     
+    @State private var isLoading = false
+    
     var body: some View {
-        List {
-            if !isUpgraded {
-                UpgradeButton(isUpgraded: $isUpgraded)
+        ZStack {
+            List {
+                if !isUpgraded {
+                    UpgradeButton(isUpgraded: $isUpgraded, isLoading: $isLoading)
+                }
+                ForEach(lineSettings) { lineSetting in
+                    LineSettingButton(lineSetting: lineSetting,
+                                      selectedLineIds: $selectedLineIds,
+                                      canSelectMultipleLines: isUpgraded)
+                }
             }
-            ForEach(lineSettings) { lineSetting in
-                LineSettingButton(lineSetting: lineSetting,
-                                  selectedLineIds: $selectedLineIds,
-                                  canSelectMultipleLines: isUpgraded)
+            if isLoading {
+                ProgressView()
             }
         }
     }
