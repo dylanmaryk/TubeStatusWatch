@@ -41,7 +41,7 @@ struct UpgradeSheet: View {
             }
         }
         .alert(item: $errorDescription) { errorDescription in
-            Alert(title: Text(errorDescription))
+            Alert(title: Text("Error"), message: Text(errorDescription))
         }
     }
     
@@ -101,7 +101,7 @@ struct UpgradeButton: View {
                          isUpgraded: $isUpgraded)
         }
         .alert(item: $errorDescription) { errorDescription in
-            Alert(title: Text(errorDescription))
+            Alert(title: Text("Error"), message: Text(errorDescription))
         }
     }
 }
