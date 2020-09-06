@@ -215,9 +215,21 @@ struct LineUpdateItem: View {
 
 struct LineUpdateList: View {
     let lines: [Line]
+    let lastRetrievedUpdatesDate: Date
+    
+    private var lastRetrievedUpdatesText: String {
+        let currentDate = Date()
+        let relativeDateString = currentDate.timeIntervalSince(lastRetrievedUpdatesDate) > 60
+            ? RelativeDateTimeFormatter().localizedString(for: lastRetrievedUpdatesDate, relativeTo: currentDate)
+            : "Just now"
+        return "Last updated:\n\(relativeDateString)"
+    }
     
     var body: some View {
         List {
+            Text(lastRetrievedUpdatesText)
+                .bold()
+                .listRowBackground(Color.clear)
             ForEach(lines) { line in
                 if !line.lineStatuses.isEmpty {
                     LineUpdateItem(name: line.name, lineStatuses: line.lineStatuses)
@@ -234,6 +246,7 @@ struct TubeStatusWatchApp: App {
     @WKExtensionDelegateAdaptor(ExtensionDelegate.self) private var extensionDelegate
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
     @AppStorage("lineUpdates") private var lineUpdatesData: Data?
+    @AppStorage("lastRetrievedUpdates") private var lastRetrievedUpdatesData: Data?
     @AppStorage("isUpgraded") private var isUpgraded = false
     @State private var isSheetPresented = false
     
@@ -255,17 +268,14 @@ struct TubeStatusWatchApp: App {
         
         WindowGroup {
             LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds, isUpgraded: $isUpgraded)
-                // Maybe remove onChange? Can make sheet appear again if new data retrieved after already dismissed.
-                .onChange(of: lineUpdatesData) { data in
-                    isSheetPresented = isSheetPresented
-                        && data?.decoded(to: [Line].self) != nil
-                        && !selectedLineIds.wrappedValue.isEmpty
-                }
                 .sheet(isPresented: $isSheetPresented) {
                     let lines = lineUpdatesData?.decoded(to: [Line].self)
+                    let lastRetrievedUpdatesDate = lastRetrievedUpdatesData?.decoded(to: Date.self)
                     let selectedLines = lines?.filter { selectedLineIds.wrappedValue.contains($0.id) }
-                    if let selectedLines = selectedLines, !selectedLines.isEmpty {
-                        LineUpdateList(lines: selectedLines)
+                    if let selectedLines = selectedLines,
+                       !selectedLines.isEmpty,
+                       let lastRetrievedUpdatesDate = lastRetrievedUpdatesDate {
+                        LineUpdateList(lines: selectedLines, lastRetrievedUpdatesDate: lastRetrievedUpdatesDate)
                     }
                 }
         }
@@ -287,6 +297,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     }
     
     @AppStorage("lineUpdates") private var lineUpdatesData: Data?
+    @AppStorage("lastRetrievedUpdates") private var lastRetrievedUpdatesData: Data?
     @AppStorage("isUpgraded") private var isUpgraded = false
     
     func applicationDidFinishLaunching() {
@@ -300,7 +311,10 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
             .dataTaskPublisher(for: url!)
             .map { $0.data }
             .receive(on: DispatchQueue.main)
-            .sink { _ in } receiveValue: { self.lineUpdatesData = $0 }
+            .sink { _ in } receiveValue: {
+                self.lineUpdatesData = $0
+                self.lastRetrievedUpdatesData = try? JSONEncoder().encode(Date())
+            }
     }
     
     func applicationDidEnterBackground() {
@@ -335,6 +349,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
                     downloadTask: URLSessionDownloadTask,
                     didFinishDownloadingTo location: URL) {
         lineUpdatesData = try? Data(contentsOf: location)
+        lastRetrievedUpdatesData = try? JSONEncoder().encode(Date())
         let complicationServer = CLKComplicationServer.sharedInstance()
         complicationServer.activeComplications?.forEach(complicationServer.reloadTimeline)
         pendingBackgroundTasks.forEach { $0.setTaskCompletedWithSnapshot(false) }
@@ -367,7 +382,7 @@ struct TubeStatusWatchApp_Previews: PreviewProvider {
             UpgradeSheet(upgradeSheetViewModel: upgradeSheetViewModel,
                          isSheetPresented: .constant(true),
                          isUpgraded: .constant(false))
-            LineUpdateList(lines: .samples)
+            LineUpdateList(lines: .samples, lastRetrievedUpdatesDate: Date().addingTimeInterval(-3660))
         }
     }
 }
