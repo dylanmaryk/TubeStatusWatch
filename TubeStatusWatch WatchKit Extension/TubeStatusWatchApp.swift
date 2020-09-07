@@ -248,12 +248,9 @@ struct TubeStatusWatchApp: App {
     @AppStorage("lineUpdates") private var lineUpdatesData: Data?
     @AppStorage("lastRetrievedUpdates") private var lastRetrievedUpdatesData: Data?
     @AppStorage("isUpgraded") private var isUpgraded = false
+    @State private var isSettingListVisible = false
     @State private var isSheetPresented = false
-    
-    init() {
-        _isSheetPresented = State(initialValue: lineUpdatesData?.decoded(to: [Line].self) != nil
-                                    && !selectedLineIdsString.isEmpty)
-    }
+    @State private var didDismissSheet = false
     
     var body: some Scene {
         let selectedLineIds = Binding(
@@ -268,7 +265,20 @@ struct TubeStatusWatchApp: App {
         
         WindowGroup {
             LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds, isUpgraded: $isUpgraded)
-                .sheet(isPresented: $isSheetPresented) {
+                .onAppear {
+                    isSettingListVisible = true
+                    if !didDismissSheet {
+                        isSheetPresented = lineUpdatesData?.decoded(to: [Line].self) != nil
+                            && !selectedLineIdsString.isEmpty
+                    }
+                }
+                .onDisappear { isSettingListVisible = false }
+                .onReceive(extensionDelegate.willEnterForegroundSubject) {
+                    isSheetPresented = (isSheetPresented || isSettingListVisible)
+                        && lineUpdatesData?.decoded(to: [Line].self) != nil
+                        && !selectedLineIdsString.isEmpty
+                }
+                .sheet(isPresented: $isSheetPresented, onDismiss: { didDismissSheet = true }) {
                     let lines = lineUpdatesData?.decoded(to: [Line].self)
                     let lastRetrievedUpdatesDate = lastRetrievedUpdatesData?.decoded(to: Date.self)
                     let selectedLines = lines?.filter { selectedLineIds.wrappedValue.contains($0.id) }
@@ -287,6 +297,8 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     private static let urlString = "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status?app_key=%@"
     private static let apiKeyInfoDictionaryKey = "TflApiKey"
     private static let purchasesApiKey = "iZVFjadDximLFdOcVsNZqtCpipfRvApB"
+    
+    let willEnterForegroundSubject = PassthroughSubject<Void, Never>()
     
     private var sessionCancellable: AnyCancellable?
     private var pendingBackgroundTasks: [WKURLSessionRefreshBackgroundTask] = []
@@ -307,6 +319,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     }
     
     func applicationWillEnterForeground() {
+        willEnterForegroundSubject.send()
         sessionCancellable = URLSession.shared
             .dataTaskPublisher(for: url!)
             .map { $0.data }
