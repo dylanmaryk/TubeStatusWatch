@@ -16,8 +16,8 @@ enum ComplicationIdentifier: String {
 }
 
 class ComplicationController: NSObject, CLKComplicationDataSource {
-    @AppStorage("lineUpdates") private var lineUpdatesData: Data?
     @AppStorage("selectedLineIds") private var selectedLineIdsString = ""
+    @AppStorage("lineUpdates") private var lineUpdatesData: Data?
     
     // MARK: - Complication Configuration
     
