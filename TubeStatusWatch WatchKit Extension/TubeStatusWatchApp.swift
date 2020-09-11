@@ -46,8 +46,8 @@ struct UpgradeSheet: View {
     }
     
     private func enableUpgrade(basedOn purchaserInfo: PurchaserInfo?, and error: Error?) {
-        if let error = error {
-            errorDescription = error.localizedDescription
+        if let error = error as NSError? {
+            errorDescription = error.purchasesLocalizedDescription
             return
         }
         if purchaserInfo?.entitlements.all["pro"]?.isActive == true {
@@ -72,8 +72,8 @@ struct UpgradeButton: View {
             isLoading = true
             Purchases.shared.offerings { offerings, error in
                 isLoading = false
-                if let error = error {
-                    errorDescription = error.localizedDescription
+                if let error = error as NSError? {
+                    errorDescription = error.purchasesLocalizedDescription
                     return
                 }
                 guard let currentOffering = offerings?.current,
@@ -248,6 +248,8 @@ struct TubeStatusWatchApp: App {
     @AppStorage("lineUpdates") private var lineUpdatesData: Data?
     @AppStorage("lastRetrievedUpdates") private var lastRetrievedUpdatesData: Data?
     @AppStorage("isUpgraded") private var isUpgraded = false
+    @AppStorage("shouldPresentFirstLineSelectedAlert") private var shouldPresentFirstLineSelectedAlert = true
+    @AppStorage("shouldPresentSecondLineSelectedAlert") private var shouldPresentSecondLineSelectedAlert = true
     @State private var isSettingListVisible = false
     @State private var isSheetPresented = false
     @State private var didDismissSheet = false
@@ -262,6 +264,17 @@ struct TubeStatusWatchApp: App {
                         name: LineData.lineNames[index],
                         isSelected: selectedLineIds.wrappedValue.contains(lineId))
         }
+        let isAlertPresented = Binding(
+            get: {
+                selectedLineIds.wrappedValue.count == 1 && shouldPresentFirstLineSelectedAlert
+                    || selectedLineIds.wrappedValue.count == 2 && shouldPresentSecondLineSelectedAlert
+            },
+            set: {
+                selectedLineIds.wrappedValue.count == 1
+                    ? (shouldPresentFirstLineSelectedAlert = $0)
+                    : (shouldPresentSecondLineSelectedAlert = $0)
+            }
+        )
         
         WindowGroup {
             LineSettingList(lineSettings: lineSettings, selectedLineIds: selectedLineIds, isUpgraded: $isUpgraded)
@@ -287,6 +300,21 @@ struct TubeStatusWatchApp: App {
                        let lastRetrievedUpdatesDate = lastRetrievedUpdatesDate {
                         LineUpdateList(lines: selectedLines, lastRetrievedUpdatesDate: lastRetrievedUpdatesDate)
                     }
+                }
+                .alert(isPresented: isAlertPresented) {
+                    selectedLineIds.wrappedValue.count == 1
+                        ? Alert(title: Text("Complication Enabled"),
+                                message: Text("""
+                                    A complication has been enabled for this line.
+                                    You can now add it to your watch face.
+                                    """))
+                        : Alert(title: Text("Multiple Complications Enabled"),
+                                message: Text("""
+                                    Two complications have been enabled:
+                                    one for this line and one for all of your lines
+                                    (supported by some watch faces).
+                                    You can now add them to your watch face.
+                                    """))
                 }
         }
     }

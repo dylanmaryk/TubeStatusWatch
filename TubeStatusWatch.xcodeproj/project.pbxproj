@@ -22,6 +22,7 @@
 		356663FF24A7C9530007DA72 /* ComplicationController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356663FE24A7C9530007DA72 /* ComplicationController.swift */; };
 		3566640124A7C9540007DA72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3566640024A7C9540007DA72 /* Assets.xcassets */; };
 		3566640424A7C9540007DA72 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3566640324A7C9540007DA72 /* Preview Assets.xcassets */; };
+		356EB20E250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356EB20D250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift */; };
 		357AF9FE25017C0F003B51A9 /* Purchases in Frameworks */ = {isa = PBXBuildFile; productRef = 357AF9FD25017C0F003B51A9 /* Purchases */; };
 		358C9FDD24FAC2AD00EF6D8F /* Configuration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */; };
 		35990D1D250408B000276AA9 /* UpgradeSheetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35990D1C250408B000276AA9 /* UpgradeSheetViewModel.swift */; };
@@ -90,6 +91,7 @@
 		3566640024A7C9540007DA72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		3566640324A7C9540007DA72 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3566640524A7C9540007DA72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		356EB20D250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSError+PurchasesLocalizedDescription.swift"; sourceTree = "<group>"; };
 		358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
 		35990D1C250408B000276AA9 /* UpgradeSheetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeSheetViewModel.swift; sourceTree = "<group>"; };
 		35B98AF524F4528700B138E8 /* Keys.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Keys.xcconfig; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 			children = (
 				35C0D04924E9769C00A7539A /* Complication+IdentifierPrefix.swift */,
 				35C86F3A24ED959500EF4EF1 /* Data+Decoded.swift */,
+				356EB20D250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift */,
 				354C70B824E84FAC00681798 /* String+ComponentsOrEmpty.swift */,
 				350721482505250F00A8F3DA /* String+Id.swift */,
 			);
@@ -337,6 +340,7 @@
 				35C0D04A24E9769C00A7539A /* Complication+IdentifierPrefix.swift in Sources */,
 				354C70B724E824B800681798 /* LineData.swift in Sources */,
 				354C70B924E84FAC00681798 /* String+ComponentsOrEmpty.swift in Sources */,
+				356EB20E250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift in Sources */,
 				3556362D24F2944F00D6EF79 /* LineStatus.swift in Sources */,
 				3556362924F2943800D6EF79 /* Line.swift in Sources */,
 				3556362624F292EF00D6EF79 /* LineSetting.swift in Sources */,

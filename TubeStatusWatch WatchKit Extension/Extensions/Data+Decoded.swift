@@ -9,6 +9,6 @@ import Foundation
 
 extension Data {
     func decoded<T>(to type: T.Type) -> T? where T : Decodable {
-        return try? JSONDecoder().decode(T.self, from: self)
+        try? JSONDecoder().decode(T.self, from: self)
     }
 }

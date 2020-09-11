@@ -7,6 +7,6 @@
 
 extension String {
     func componentsOrEmpty(separatedBy separator: String) -> [String] {
-        return isEmpty ? [] : components(separatedBy: separator)
+        isEmpty ? [] : components(separatedBy: separator)
     }
 }
