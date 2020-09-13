@@ -9,6 +9,24 @@
           "revision": "1d8c19602a0e4818254a4805d324515bde293167",
           "version": "3.5.3"
         }
+      },
+      {
+        "package": "SwiftSoup",
+        "repositoryURL": "https://github.com/scinfu/SwiftSoup.git",
+        "state": {
+          "branch": null,
+          "revision": "774dc9c7213085db8aa59595e27c1cd22e428904",
+          "version": "2.3.2"
+        }
+      },
+      {
+        "package": "XMLCoder",
+        "repositoryURL": "https://github.com/MaxDesiatov/XMLCoder.git",
+        "state": {
+          "branch": null,
+          "revision": "ac411bd6ab342780be0dfe6f679410f791d751d9",
+          "version": "0.11.1"
+        }
       }
     ]
   },

@@ -13,7 +13,7 @@
 		354C70B924E84FAC00681798 /* String+ComponentsOrEmpty.swift in Sources */ = {isa = PBXBuildFile; fileRef = 354C70B824E84FAC00681798 /* String+ComponentsOrEmpty.swift */; };
 		3556362624F292EF00D6EF79 /* LineSetting.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3556362524F292EF00D6EF79 /* LineSetting.swift */; };
 		3556362924F2943800D6EF79 /* Line.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3556362824F2943800D6EF79 /* Line.swift */; };
-		3556362D24F2944F00D6EF79 /* LineStatus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3556362C24F2944F00D6EF79 /* LineStatus.swift */; };
+		3556362D24F2944F00D6EF79 /* StatusSeverity.swift in Sources */ = {isa = PBXBuildFile; fileRef = 3556362C24F2944F00D6EF79 /* StatusSeverity.swift */; };
 		356663EA24A7C9510007DA72 /* TubeStatusWatch WatchKit App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = 356663E924A7C9510007DA72 /* TubeStatusWatch WatchKit App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		356663EF24A7C9530007DA72 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 356663EE24A7C9530007DA72 /* Assets.xcassets */; };
 		356663F624A7C9530007DA72 /* TubeStatusWatch WatchKit Extension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 356663F524A7C9530007DA72 /* TubeStatusWatch WatchKit Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -24,8 +24,11 @@
 		3566640424A7C9540007DA72 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 3566640324A7C9540007DA72 /* Preview Assets.xcassets */; };
 		356EB20E250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift in Sources */ = {isa = PBXBuildFile; fileRef = 356EB20D250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift */; };
 		357AF9FE25017C0F003B51A9 /* Purchases in Frameworks */ = {isa = PBXBuildFile; productRef = 357AF9FD25017C0F003B51A9 /* Purchases */; };
-		358C9FDD24FAC2AD00EF6D8F /* Configuration.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */; };
 		35990D1D250408B000276AA9 /* UpgradeSheetViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35990D1C250408B000276AA9 /* UpgradeSheetViewModel.swift */; };
+		359D86DE250E315E00C47437 /* XMLCoder in Frameworks */ = {isa = PBXBuildFile; productRef = 359D86DD250E315E00C47437 /* XMLCoder */; };
+		359D86E0250E331100C47437 /* Service.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359D86DF250E331100C47437 /* Service.swift */; };
+		359D86E2250E337600C47437 /* Subway.swift in Sources */ = {isa = PBXBuildFile; fileRef = 359D86E1250E337600C47437 /* Subway.swift */; };
+		359D86E5250E9FD800C47437 /* SwiftSoup in Frameworks */ = {isa = PBXBuildFile; productRef = 359D86E4250E9FD800C47437 /* SwiftSoup */; };
 		35C0D04A24E9769C00A7539A /* Complication+IdentifierPrefix.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C0D04924E9769C00A7539A /* Complication+IdentifierPrefix.swift */; };
 		35C86F3B24ED959500EF4EF1 /* Data+Decoded.swift in Sources */ = {isa = PBXBuildFile; fileRef = 35C86F3A24ED959500EF4EF1 /* Data+Decoded.swift */; };
 /* End PBXBuildFile section */
@@ -79,7 +82,7 @@
 		354C70B824E84FAC00681798 /* String+ComponentsOrEmpty.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+ComponentsOrEmpty.swift"; sourceTree = "<group>"; };
 		3556362524F292EF00D6EF79 /* LineSetting.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineSetting.swift; sourceTree = "<group>"; };
 		3556362824F2943800D6EF79 /* Line.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Line.swift; sourceTree = "<group>"; };
-		3556362C24F2944F00D6EF79 /* LineStatus.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LineStatus.swift; sourceTree = "<group>"; };
+		3556362C24F2944F00D6EF79 /* StatusSeverity.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StatusSeverity.swift; sourceTree = "<group>"; };
 		356663E524A7C9510007DA72 /* TubeStatusWatch.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TubeStatusWatch.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		356663E924A7C9510007DA72 /* TubeStatusWatch WatchKit App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "TubeStatusWatch WatchKit App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		356663EE24A7C9530007DA72 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -92,9 +95,9 @@
 		3566640324A7C9540007DA72 /* Preview Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = "Preview Assets.xcassets"; sourceTree = "<group>"; };
 		3566640524A7C9540007DA72 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		356EB20D250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSError+PurchasesLocalizedDescription.swift"; sourceTree = "<group>"; };
-		358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */ = {isa = PBXFileReference; lastKnownFileType = text; path = Configuration.storekit; sourceTree = "<group>"; };
 		35990D1C250408B000276AA9 /* UpgradeSheetViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UpgradeSheetViewModel.swift; sourceTree = "<group>"; };
-		35B98AF524F4528700B138E8 /* Keys.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Keys.xcconfig; sourceTree = "<group>"; };
+		359D86DF250E331100C47437 /* Service.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Service.swift; sourceTree = "<group>"; };
+		359D86E1250E337600C47437 /* Subway.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Subway.swift; sourceTree = "<group>"; };
 		35C0D04924E9769C00A7539A /* Complication+IdentifierPrefix.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Complication+IdentifierPrefix.swift"; sourceTree = "<group>"; };
 		35C86F3A24ED959500EF4EF1 /* Data+Decoded.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Data+Decoded.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -104,7 +107,9 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				359D86DE250E315E00C47437 /* XMLCoder in Frameworks */,
 				357AF9FE25017C0F003B51A9 /* Purchases in Frameworks */,
+				359D86E5250E9FD800C47437 /* SwiftSoup in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -117,7 +122,9 @@
 				3556362824F2943800D6EF79 /* Line.swift */,
 				354C70B624E824B800681798 /* LineData.swift */,
 				3556362524F292EF00D6EF79 /* LineSetting.swift */,
-				3556362C24F2944F00D6EF79 /* LineStatus.swift */,
+				3556362C24F2944F00D6EF79 /* StatusSeverity.swift */,
+				359D86DF250E331100C47437 /* Service.swift */,
+				359D86E1250E337600C47437 /* Subway.swift */,
 				35990D1C250408B000276AA9 /* UpgradeSheetViewModel.swift */,
 			);
 			path = Models;
@@ -170,8 +177,6 @@
 				3556362424F292DC00D6EF79 /* Models */,
 				3566640024A7C9540007DA72 /* Assets.xcassets */,
 				3566640524A7C9540007DA72 /* Info.plist */,
-				358C9FDC24FAC2AD00EF6D8F /* Configuration.storekit */,
-				35B98AF524F4528700B138E8 /* Keys.xcconfig */,
 				3566640224A7C9540007DA72 /* Preview Content */,
 			);
 			path = "TubeStatusWatch WatchKit Extension";
@@ -249,6 +254,8 @@
 			name = "TubeStatusWatch WatchKit Extension";
 			packageProductDependencies = (
 				357AF9FD25017C0F003B51A9 /* Purchases */,
+				359D86DD250E315E00C47437 /* XMLCoder */,
+				359D86E4250E9FD800C47437 /* SwiftSoup */,
 			);
 			productName = "TubeStatusWatch WatchKit Extension";
 			productReference = 356663F524A7C9530007DA72 /* TubeStatusWatch WatchKit Extension.appex */;
@@ -285,6 +292,8 @@
 			mainGroup = 356663DE24A7C9510007DA72;
 			packageReferences = (
 				357AF9FC25017C0F003B51A9 /* XCRemoteSwiftPackageReference "purchases-ios" */,
+				359D86DC250E315E00C47437 /* XCRemoteSwiftPackageReference "XMLCoder" */,
+				359D86E3250E9FD800C47437 /* XCRemoteSwiftPackageReference "SwiftSoup" */,
 			);
 			productRefGroup = 356663E624A7C9510007DA72 /* Products */;
 			projectDirPath = "";
@@ -318,7 +327,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				3566640424A7C9540007DA72 /* Preview Assets.xcassets in Resources */,
-				358C9FDD24FAC2AD00EF6D8F /* Configuration.storekit in Resources */,
 				3566640124A7C9540007DA72 /* Assets.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -332,6 +340,8 @@
 			files = (
 				356663FB24A7C9530007DA72 /* ContentView.swift in Sources */,
 				354C70B524E813AF00681798 /* StatusSeverityMapper.swift in Sources */,
+				359D86E2250E337600C47437 /* Subway.swift in Sources */,
+				359D86E0250E331100C47437 /* Service.swift in Sources */,
 				356663FD24A7C9530007DA72 /* TubeStatusWatchApp.swift in Sources */,
 				35990D1D250408B000276AA9 /* UpgradeSheetViewModel.swift in Sources */,
 				356663FF24A7C9530007DA72 /* ComplicationController.swift in Sources */,
@@ -341,7 +351,7 @@
 				354C70B724E824B800681798 /* LineData.swift in Sources */,
 				354C70B924E84FAC00681798 /* String+ComponentsOrEmpty.swift in Sources */,
 				356EB20E250BBAF00006FB57 /* NSError+PurchasesLocalizedDescription.swift in Sources */,
-				3556362D24F2944F00D6EF79 /* LineStatus.swift in Sources */,
+				3556362D24F2944F00D6EF79 /* StatusSeverity.swift in Sources */,
 				3556362924F2943800D6EF79 /* Line.swift in Sources */,
 				3556362624F292EF00D6EF79 /* LineSetting.swift in Sources */,
 			);
@@ -479,7 +489,6 @@
 		};
 		3566640924A7C9540007DA72 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 35B98AF524F4528700B138E8 /* Keys.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_STYLE = Automatic;
@@ -492,7 +501,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch.watchkitapp.watchkitextension;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.SubwayStatusWatch.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -504,7 +513,6 @@
 		};
 		3566640A24A7C9540007DA72 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 35B98AF524F4528700B138E8 /* Keys.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_COMPLICATION_NAME = Complication;
 				CODE_SIGN_STYLE = Automatic;
@@ -517,7 +525,7 @@
 					"@executable_path/Frameworks",
 					"@executable_path/../../Frameworks",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch.watchkitapp.watchkitextension;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.SubwayStatusWatch.watchkitapp.watchkitextension;
 				PRODUCT_NAME = "${TARGET_NAME}";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -537,7 +545,7 @@
 				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				IBSC_MODULE = TubeStatusWatch_WatchKit_Extension;
 				INFOPLIST_FILE = "TubeStatusWatch WatchKit App/Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.SubwayStatusWatch.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -557,7 +565,7 @@
 				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				IBSC_MODULE = TubeStatusWatch_WatchKit_Extension;
 				INFOPLIST_FILE = "TubeStatusWatch WatchKit App/Info.plist";
-				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch.watchkitapp;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.SubwayStatusWatch.watchkitapp;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = watchos;
 				SKIP_INSTALL = YES;
@@ -571,12 +579,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.SubwayStatusWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Debug;
@@ -585,12 +595,14 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1;
 				DEVELOPMENT_TEAM = 5DQD7ZRCTK;
 				MARKETING_VERSION = 1.0;
-				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.TubeStatusWatch;
+				PRODUCT_BUNDLE_IDENTIFIER = io.dylanmaryk.SubwayStatusWatch;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_VERSION = 5.0;
 			};
 			name = Release;
@@ -645,6 +657,22 @@
 				minimumVersion = 3.5.3;
 			};
 		};
+		359D86DC250E315E00C47437 /* XCRemoteSwiftPackageReference "XMLCoder" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/MaxDesiatov/XMLCoder.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.11.1;
+			};
+		};
+		359D86E3250E9FD800C47437 /* XCRemoteSwiftPackageReference "SwiftSoup" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/scinfu/SwiftSoup.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.3.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -652,6 +680,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 357AF9FC25017C0F003B51A9 /* XCRemoteSwiftPackageReference "purchases-ios" */;
 			productName = Purchases;
+		};
+		359D86DD250E315E00C47437 /* XMLCoder */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 359D86DC250E315E00C47437 /* XCRemoteSwiftPackageReference "XMLCoder" */;
+			productName = XMLCoder;
+		};
+		359D86E4250E9FD800C47437 /* SwiftSoup */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 359D86E3250E9FD800C47437 /* XCRemoteSwiftPackageReference "SwiftSoup" */;
+			productName = SwiftSoup;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

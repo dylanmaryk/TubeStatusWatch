@@ -38,29 +38,24 @@ enum StatusSeverityMapper {
     
     static func statusLevel(for statusSeverity: StatusSeverity) -> StatusLevel {
         switch statusSeverity {
-        case .goodService,
-             .noIssues:
+        case .crowding,
+             .weekendService,
+             .weekdayService,
+             .goodService:
             return .good
-        case .specialService,
-             .partSuspended,
-             .reducedService,
-             .minorDelays,
-             .exitOnly,
-             .noStepFreeAccess,
-             .changeOfFrequency,
-             .issuesReported,
-             .information:
+        case .localToExpress,
+             .expressToLocal,
+             .stationsSkipped,
+             .someDelays,
+             .slowSpeeds:
             return .ok
-        case .closed,
-             .suspended,
-             .plannedClosure,
-             .partClosure,
-             .severeDelays,
-             .busService,
-             .partClosed,
-             .diverted,
-             .notRunning,
-             .serviceClosed:
+        case .suspended,
+             .plannedWork,
+             .multipleImpacts,
+             .partSuspended,
+             .trainsRerouted,
+             .delays,
+             .serviceChange:
             return .bad
         }
     }

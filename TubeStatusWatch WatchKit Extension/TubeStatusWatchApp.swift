@@ -8,6 +8,7 @@
 import ClockKit
 import Combine
 import Purchases
+import SwiftSoup
 import SwiftUI
 
 // MARK: - Upgrade
@@ -176,17 +177,15 @@ struct LineSettingList: View {
 // MARK: - Line Updates
 
 struct LineUpdateItemStatusSeverity: View {
-    let statusSeverityDescription: String?
+    let statusSeverityDescription: String
     let statusSeverityColor: Color?
     let reason: String?
     
     var body: some View {
-        if let statusSeverityDescription = statusSeverityDescription {
-            Text(statusSeverityDescription)
-                .font(.headline)
-                .foregroundColor(statusSeverityColor)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
+        Text(statusSeverityDescription)
+            .font(.headline)
+            .foregroundColor(statusSeverityColor)
+            .frame(maxWidth: .infinity, alignment: .leading)
         if let reason = reason {
             Text(reason)
                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -196,19 +195,17 @@ struct LineUpdateItemStatusSeverity: View {
 
 struct LineUpdateItem: View {
     let name: String
-    let lineStatuses: [LineStatus]
+    let status: StatusSeverity
+    let text: String?
     
     var body: some View {
         VStack {
             Text(name)
                 .font(.title3)
                 .frame(maxWidth: .infinity, alignment: .leading)
-            ForEach(lineStatuses, id: \.self) { lineStatus in
-                LineUpdateItemStatusSeverity(statusSeverityDescription: lineStatus.statusSeverityDescription,
-                                             statusSeverityColor: StatusSeverityMapper
-                                                .color(for: lineStatus.statusSeverity),
-                                             reason: lineStatus.reason)
-            }
+            LineUpdateItemStatusSeverity(statusSeverityDescription: status.rawValue,
+                                         statusSeverityColor: StatusSeverityMapper.color(for: status),
+                                         reason: text)
         }
     }
 }
@@ -231,11 +228,21 @@ struct LineUpdateList: View {
                 .bold()
                 .listRowBackground(Color.clear)
             ForEach(lines) { line in
-                if !line.lineStatuses.isEmpty {
-                    LineUpdateItem(name: line.name, lineStatuses: line.lineStatuses)
-                }
+                LineUpdateItem(name: line.name, status: line.status, text: lineText(forHtml: line.text))
             }
         }
+    }
+    
+    private func lineText(forHtml html: String) -> String? {
+        let document = try? SwiftSoup.parse(html)
+        let text = try? SwiftSoup.clean(document?.text() ?? "",
+                                        "",
+                                        .none(),
+                                        OutputSettings().prettyPrint(pretty: true))
+        return text?
+            .replacingOccurrences(of: "&nbsp; ", with: "\n")
+            .replacingOccurrences(of: "&nbsp;", with: "\n")
+            .replacingOccurrences(of: "&amp;", with: " & ")
     }
 }
 
@@ -281,18 +288,18 @@ struct TubeStatusWatchApp: App {
                 .onAppear {
                     isSettingListVisible = true
                     if !didDismissSheet {
-                        isSheetPresented = lineUpdatesData?.decoded(to: [Line].self) != nil
+                        isSheetPresented = lineUpdatesData?.xmlDecoded(to: Service.self)?.subway.lines != nil
                             && !selectedLineIdsString.isEmpty
                     }
                 }
                 .onDisappear { isSettingListVisible = false }
                 .onReceive(extensionDelegate.willEnterForegroundSubject) {
                     isSheetPresented = (isSheetPresented || isSettingListVisible)
-                        && lineUpdatesData?.decoded(to: [Line].self) != nil
+                        && lineUpdatesData?.xmlDecoded(to: Service.self)?.subway.lines != nil
                         && !selectedLineIdsString.isEmpty
                 }
                 .sheet(isPresented: $isSheetPresented, onDismiss: { didDismissSheet = true }) {
-                    let lines = lineUpdatesData?.decoded(to: [Line].self)
+                    let lines = lineUpdatesData?.xmlDecoded(to: Service.self)?.subway.lines
                     let lastRetrievedUpdatesDate = lastRetrievedUpdatesData?.decoded(to: Date.self)
                     let selectedLines = lines?.filter { selectedLineIds.wrappedValue.contains($0.id) }
                     if let selectedLines = selectedLines,
@@ -322,8 +329,7 @@ struct TubeStatusWatchApp: App {
 
 class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelegate {
     private static let backgroundRefreshIntervalInMinutes = 15.0
-    private static let urlString = "https://api.tfl.gov.uk/line/mode/dlr,overground,tflrail,tram,tube/status?app_key=%@"
-    private static let apiKeyInfoDictionaryKey = "TflApiKey"
+    private static let urlString = "http://web.mta.info/status/serviceStatus.txt"
     private static let purchasesApiKey = "iZVFjadDximLFdOcVsNZqtCpipfRvApB"
     
     let willEnterForegroundSubject = PassthroughSubject<Void, Never>()
@@ -331,10 +337,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     private var sessionCancellable: AnyCancellable?
     private var pendingBackgroundTasks: [WKURLSessionRefreshBackgroundTask] = []
     
-    private var url: URL? {
-        let apiKey = Bundle.main.object(forInfoDictionaryKey: Self.apiKeyInfoDictionaryKey)
-        return URL(string: String(format: Self.urlString, apiKey as! String))
-    }
+    private var url: URL? { URL(string: Self.urlString) }
     
     @AppStorage("lineUpdates") private var lineUpdatesData: Data?
     @AppStorage("lastRetrievedUpdates") private var lastRetrievedUpdatesData: Data?
@@ -369,7 +372,7 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
             switch task {
             case let appTask as WKApplicationRefreshBackgroundTask:
                 let configuration = URLSessionConfiguration
-                    .background(withIdentifier: "io.dylanmaryk.TubeStatusWatch.task")
+                    .background(withIdentifier: "io.dylanmaryk.SubwayStatusWatch.task")
                 let session = URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
                 let downloadTask = session.downloadTask(with: url!)
                 downloadTask.resume()
