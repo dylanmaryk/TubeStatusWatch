@@ -234,15 +234,34 @@ struct LineUpdateList: View {
     }
     
     private func lineText(forHtml html: String) -> String? {
-        let document = try? SwiftSoup.parse(html)
-        let text = try? SwiftSoup.clean(document?.text() ?? "",
-                                        "",
-                                        .none(),
-                                        OutputSettings().prettyPrint(pretty: true))
-        return text?
+        let text = html
+            .replacingOccurrences(of: "</b></b>", with: " ")
+            .replacingOccurrences(of: "<b>", with: " ")
+            .replacingOccurrences(of: "</b>", with: " ")
+            .replacingOccurrences(of: "</p><p></p><p>", with: "&nbsp;&nbsp;")
+            .replacingOccurrences(of: "</p><p>", with: "&nbsp;&nbsp;")
+            .replacingOccurrences(of: "<p>", with: "&nbsp;")
+            .replacingOccurrences(of: "</p>", with: "&nbsp;")
+            .replacingOccurrences(of: "<br/><br/>", with: "&nbsp;")
+            .replacingOccurrences(of: "<br/><br>", with: "&nbsp;")
+            .replacingOccurrences(of: "<strong>", with: " ")
+            .replacingOccurrences(of: "</strong>", with: " ")
+            .replacingOccurrences(of: " ,", with: ",")
+            .replacingOccurrences(of: " .", with: ".")
+        let document = try? SwiftSoup.parse(text)
+        var cleanText = try? SwiftSoup.clean(document?.body()?.html() ?? "",
+                                             "",
+                                             .none(),
+                                             OutputSettings().prettyPrint(pretty: true))
+        if cleanText?.hasSuffix("&nbsp;&nbsp;") == true, let cleanTextSubstring = cleanText?.dropLast(12) {
+            cleanText = String(cleanTextSubstring)
+        }
+        cleanText = cleanText?
+            .replacingOccurrences(of: "&nbsp;   ", with: "\n")
             .replacingOccurrences(of: "&nbsp; ", with: "\n")
             .replacingOccurrences(of: "&nbsp;", with: "\n")
             .replacingOccurrences(of: "&amp;", with: " & ")
+        return cleanText
     }
 }
 
