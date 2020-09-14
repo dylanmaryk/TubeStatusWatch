@@ -142,11 +142,11 @@ struct RectangularFullComplicationContentView: View {
 
 struct ContentView_Previews: PreviewProvider {
     static var previews: some View {
-        let firstSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("bakerloo"),
+        let firstSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("123"),
                                                                      borderColor: .green)
-        let secondSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("central"),
+        let secondSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("456"),
                                                                       borderColor: .yellow)
-        let thirdSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("circle"),
+        let thirdSliceViewModel = CircularComplicationSliceViewModel(fillColor: Color("7"),
                                                                      borderColor: .red)
         let circularOneLineContentView = CircularComplicationContentView(viewModels: [firstSliceViewModel])
         let circularTwoLinesContentView = CircularComplicationContentView(viewModels: [firstSliceViewModel,
@@ -154,9 +154,9 @@ struct ContentView_Previews: PreviewProvider {
         let circularThreeLinesContentView = CircularComplicationContentView(viewModels: [firstSliceViewModel,
                                                                                          secondSliceViewModel,
                                                                                          thirdSliceViewModel])
-        let rectangularFullContentView = RectangularFullComplicationContentView(title: "Bakerloo",
-                                                                                subtitle: "Good Service",
-                                                                                backgroundColor: Color("bakerloo"),
+        let rectangularFullContentView = RectangularFullComplicationContentView(title: "123",
+                                                                                subtitle: "GOOD SERVICE",
+                                                                                backgroundColor: Color("123"),
                                                                                 borderColor: nil)
         
         Group {

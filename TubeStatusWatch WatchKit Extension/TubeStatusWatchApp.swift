@@ -431,16 +431,16 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
 
 struct TubeStatusWatchApp_Previews: PreviewProvider {
     static var previews: some View {
-        let lineSettings = [LineSetting(id: "bakerloo", name: "Bakerloo", isSelected: true),
-                            LineSetting(id: "central", name: "Central", isSelected: false),
-                            LineSetting(id: "circle", name: "Circle", isSelected: false)]
+        let lineSettings = [LineSetting(id: "123", name: "123", isSelected: true),
+                            LineSetting(id: "456", name: "456", isSelected: false),
+                            LineSetting(id: "7", name: "7", isSelected: false)]
         let upgradeSheetViewModel = UpgradeSheetViewModel(localizedDescription: "The standard set of packages",
                                                           localizedPrice: "£0.99",
                                                           package: Package())
         
         Group {
             LineSettingList(lineSettings: lineSettings,
-                            selectedLineIds: .constant(["bakerloo"]),
+                            selectedLineIds: .constant(["123"]),
                             isUpgraded: .constant(false))
             UpgradeSheet(upgradeSheetViewModel: upgradeSheetViewModel,
                          isSheetPresented: .constant(true),
