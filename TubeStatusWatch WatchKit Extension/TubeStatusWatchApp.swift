@@ -330,7 +330,7 @@ struct TubeStatusWatchApp: App {
 class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelegate {
     private static let backgroundRefreshIntervalInMinutes = 15.0
     private static let urlString = "http://web.mta.info/status/serviceStatus.txt"
-    private static let purchasesApiKey = "iZVFjadDximLFdOcVsNZqtCpipfRvApB"
+    private static let purchasesApiKey = "PbzCzncWrKoEsWEdzpCIjGWmLgzGcqSP"
     
     let willEnterForegroundSubject = PassthroughSubject<Void, Never>()
     
