@@ -11,6 +11,7 @@ enum StatusSeverity: String, Codable {
     case partSuspended = "PART SUSPENDED"
     case plannedWork = "PLANNED WORK"
     case trainsRerouted = "TRAINS REROUTED"
+    case someReroutes = "SOME REROUTES"
     case delays = "DELAYS"
     case serviceChange = "SERVICE CHANGE"
     case localToExpress = "LOCAL TO EXPRESS"
@@ -22,4 +23,9 @@ enum StatusSeverity: String, Codable {
     case weekendService = "WEEKEND SERVICE"
     case weekdayService = "WEEKDAY SERVICE"
     case goodService = "GOOD SERVICE"
+    case unknown = "UNKNOWN STATUS"
+    
+    init(from decoder: Decoder) throws {
+        self = StatusSeverity(rawValue: try decoder.singleValueContainer().decode(String.self)) ?? .unknown
+    }
 }

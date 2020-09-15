@@ -8,6 +8,7 @@
 import SwiftUI
 
 enum StatusLevel: Comparable {
+    case unknown
     case good
     case ok
     case bad
@@ -16,6 +17,8 @@ enum StatusLevel: Comparable {
 enum StatusSeverityMapper {
     static func color(for statusSeverity: StatusSeverity) -> Color {
         switch Self.statusLevel(for: statusSeverity) {
+        case .unknown:
+            return .gray
         case .good:
             return .green
         case .ok:
@@ -27,6 +30,8 @@ enum StatusSeverityMapper {
     
     static func systemImageName(for statusSeverity: StatusSeverity) -> String {
         switch Self.statusLevel(for: statusSeverity) {
+        case .unknown:
+            return "questionmark"
         case .good:
             return "checkmark"
         case .ok:
@@ -38,6 +43,8 @@ enum StatusSeverityMapper {
     
     static func statusLevel(for statusSeverity: StatusSeverity) -> StatusLevel {
         switch statusSeverity {
+        case .unknown:
+            return .unknown
         case .crowding,
              .weekendService,
              .weekdayService,
@@ -54,6 +61,7 @@ enum StatusSeverityMapper {
              .multipleImpacts,
              .partSuspended,
              .trainsRerouted,
+             .someReroutes,
              .delays,
              .serviceChange:
             return .bad
