@@ -342,7 +342,6 @@ class ExtensionDelegate: NSObject, WKExtensionDelegate, URLSessionDownloadDelega
     
     func applicationDidFinishLaunching() {
         scheduleBackgroundRefresh()
-        Purchases.debugLogsEnabled = true
         Purchases.configure(withAPIKey: Self.purchasesApiKey)
     }
     
