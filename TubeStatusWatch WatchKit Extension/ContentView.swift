@@ -132,8 +132,10 @@ struct RectangularFullComplicationContentView: View {
             VStack {
                 Text(title)
                     .font(.headline)
+                    .multilineTextAlignment(.center)
                 Text(subtitle)
                     .font(.subheadline)
+                    .multilineTextAlignment(.center)
             }
             .padding(.init(top: 0, leading: Self.cornerRadius / 2, bottom: 0, trailing: Self.cornerRadius / 2))
         }
