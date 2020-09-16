@@ -6,6 +6,7 @@
 //
 
 enum StatusSeverity: String, Codable {
+    case noScheduledService = "NO SCHEDULED SERVICE"
     case suspended = "SUSPENDED"
     case multipleImpacts = "MULTIPLE IMPACTS"
     case partSuspended = "PART SUSPENDED"

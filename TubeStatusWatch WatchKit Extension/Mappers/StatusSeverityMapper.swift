@@ -56,7 +56,8 @@ enum StatusSeverityMapper {
              .someDelays,
              .slowSpeeds:
             return .ok
-        case .suspended,
+        case .noScheduledService,
+             .suspended,
              .plannedWork,
              .multipleImpacts,
              .partSuspended,
